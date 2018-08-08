@@ -15,7 +15,11 @@ if __name__ == '__main__':
             time.sleep(5)
 
     # 订阅 KLine 数据
-    tradeStr="""{"sub": "market.ethusdt.kline.1min","id": "id10"}"""
+    tradeStr = """{"sub": "market.ethusdt.kline.1min","id": "id10"}"""
+    ws.send(tradeStr)
+
+    tradeStr = """{"sub": "market.btcusdt.kline.1min","id": "id10"}"""
+    ws.send(tradeStr)
 
     # 请求 KLine 数据
     # tradeStr="""{"req": "market.ethusdt.kline.1min","id": "id10", "from": 1513391453, "to": 1513392453}"""
@@ -35,7 +39,7 @@ if __name__ == '__main__':
     #请求 Market Detail 数据
     # tradeStr="""{"req": "market.ethusdt.detail", "id": "id12"}"""
 
-    ws.send(tradeStr)
+    
     while(1):
         compressData=ws.recv()
         result=gzip.decompress(compressData).decode('utf-8')
