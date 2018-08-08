@@ -12,6 +12,10 @@ python verion: python3
 ```bash
  pip3 install websocket_client
 ```
+* 安装 python-deamon
+```bash
+python3 -m pip install 'python-daemon'
+```
 
 ## 编译
 

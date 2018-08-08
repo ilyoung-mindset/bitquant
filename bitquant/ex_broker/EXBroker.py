@@ -1,5 +1,6 @@
 import threading
 import time 
+import logging
 from bitquant.core import Service
 
 '''
@@ -8,11 +9,11 @@ Market data API
 
 class EXBrokerService(Service.Service):
     def __init__(self):
-        Service.Service.__init__(self, "EXBroker")
+        Service.Service.__init__(self, "EXBroker", TaskProccess)
         self.taskHandler = TaskProccess
         
 def TaskProccess(task):
-        print(task.data)
+    logging.debug(task.data)
     
 if __name__ == "__main__":
     service = EXBrokerService()
