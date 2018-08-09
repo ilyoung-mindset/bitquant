@@ -17,7 +17,7 @@ python verion: python3
 python3 -m pip install 'python-daemon'
 ```
 
-## 编译
-
-
 ## 运行
+```
+python3 -m bitquant.app
+```

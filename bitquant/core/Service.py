@@ -3,42 +3,38 @@ import time
 import queue
 import logging
 
+from bitquant.core import Events
+
 '''
 project Service base class
 '''
 
-class Task:
-     def __init__(self, action, id, data):
-         self.action = action
-         self.id = id
-         self.data = data 
-
 class ServiceThread(threading.Thread):
-    def __init__(self, q, handler):
+    def __init__(self, name, q, handler):
         threading.Thread.__init__(self)
         # 初始化
         # self.threadID = threadID
-        # self.name = name
-        self.workQueue = q
-        self.taskHandler = handler
+        self.name = name
+        self.eventQueue = q
+        self.eventHandler = handler
 
     def run(self):
         logging.debug("service run ...")
         while True:
-            task = self.workQueue.get()
+            ev = self.eventQueue.get()
 
-            if task.action == 'quit':
-                logging.info('service quit')
+            if ev.event == 'quit':
+                logging.info('service['+self.name+'] quit')
                 break
             
-            self.taskHandler(task)
+            self.eventHandler(ev)
             
 
 class Service:
     def __init__(self, name, proccess):
-        self.workQuque = queue.Queue()
+        self.eventQueue = queue.Queue()
         self.name = name
-        self.thread = ServiceThread(self.workQuque, proccess)
+        self.thread = ServiceThread(self.name, self.eventQueue, proccess)
         
 
     def start(self):
@@ -47,20 +43,40 @@ class Service:
     
     def stop(self):
         logging.debug("service["+self.name+"] stop ...")
-        task = Task('quit', str(1), "quit request")
-        self.workQuque.put(task)
+        ev = Events.Event('quit', str(1), "quit request")
+        self.eventQueue.put(ev)
     
-def TaskProccess(task):
-        print(task.data)
+
+
+class ServiceMgr:
+    def __init__(self, services):
+        self.services = services
+    
+    def start(self):
+        for k in self.services.keys():
+            service = self.services[k]
+            service.start()
+
+    def stop(self):
+        for k in self.services.keys():
+            service = self.services[k]
+            service.stop()
+
+def EventProccess(e):
+        print(e.data)
 
 
 if __name__ == "__main__":
-    service = Service("test", TaskProccess)
-    service.start()
+    services = {
+        'test': Service("test", EventProccess)
+    }
+    mgr = ServiceMgr(services)
 
-    for num in range(1, 5):
-        task = Task('data', str(num), "task:"+str(num))
-        service.workQuque.put(task)
+    mgr.start()
+
+    for num in range(1, 20):
+        ev = Events.Event('data', str(num), "event:"+str(num))
+        services['test'].eventQueue.put(ev)
         time.sleep(1)
 
-    service.stop()
+    mgr.stop()

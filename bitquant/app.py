@@ -1,14 +1,29 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import sys
+import threading
 import time
+import signal
 import logging
 import optparse
 from daemon.runner import DaemonRunner
 
 from bitquant.core import Service
+from bitquant.core import Events
+from bitquant.core import Worker
+from bitquant.core import Task
+
 from bitquant.ex_broker import EXBroker
 
+
+routes = {
+    'test': Worker.Router(),
+}
+
+services = {
+    'WorkerService': Worker.WorkerService(routes),
+    'EXBrokerService': EXBroker.EXBrokerService(),
+}
 
 class App(object):
     def __init__(self):
@@ -24,20 +39,28 @@ class App(object):
         console.setFormatter(formatter)
         logging.getLogger('').addHandler(console)
 
+        self.servMgr = Service.ServiceMgr(services)
+
     def run(self):
-        service = EXBroker.EXBrokerService()
-        service.start()
+        self.servMgr.start()
 
         logging.info("bitquant startup.")
 
         for num in range(1, 5):
-            task = Service.Task('data', str(num), "task:"+str(num))
-            service.workQuque.put(task)
+            task = Task.Task(self, 'test', str(num), "test task:"+str(num))
+            services['WorkerService'].taskQueue.put(task)
             time.sleep(1)
 
-        service.stop()
-        logging.warning('bitquant shutdown')
+    def stop(self):
+        self.servMgr.stop()
+        logging.info('bitquant shutdown')
 
+app = App()
+
+def appQuit(signum, frame):
+    logging.warning('receive signal SIGTERM')
+    app.stop()
+    
 if __name__ == "__main__":
     parse = optparse.OptionParser( usage='"usage:%prog [options]"', version="%prog 0.1")
     parse.add_option('-d', dest='daemon', action='store_true', metavar='daemon', help='bitquant run as daemon ')
@@ -46,7 +69,7 @@ if __name__ == "__main__":
 
     options, args = parse.parse_args()
 
-    app = App()
+    signal.signal(signal.SIGTERM, appQuit)
 
     if options.daemon:
         print("run as daemon")
@@ -54,3 +77,5 @@ if __name__ == "__main__":
         run.do_action()
     else:
         app.run()
+
+
