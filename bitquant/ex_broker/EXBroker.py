@@ -9,8 +9,8 @@ Market data API
 '''
 
 class EXBrokerService(Service.Service):
-    def __init__(self):
-        Service.Service.__init__(self, "EXBroker", EventProccess)
+    def __init__(self, ctx):
+        Service.Service.__init__(self, ctx, "EXBroker", EventProccess)
         self.eventHandler = EventProccess
         
 
@@ -18,7 +18,7 @@ def EventProccess(e):
     logging.debug(e.data)
     
 if __name__ == "__main__":
-    service = EXBrokerService()
+    service = EXBrokerService(None)
     service.start()
 
     for num in range(1, 5):

@@ -31,7 +31,8 @@ class ServiceThread(threading.Thread):
             
 
 class Service:
-    def __init__(self, name, proccess):
+    def __init__(self, ctx, name, proccess):
+        self.ctx = ctx
         self.eventQueue = queue.Queue()
         self.name = name
         self.thread = ServiceThread(self.name, self.eventQueue, proccess)
@@ -49,7 +50,8 @@ class Service:
 
 
 class ServiceMgr:
-    def __init__(self, services):
+    def __init__(self, ctx, services):
+        self.ctx = ctx
         self.services = services
     
     def start(self):
@@ -68,9 +70,9 @@ def EventProccess(e):
 
 if __name__ == "__main__":
     services = {
-        'test': Service("test", EventProccess)
+        'test': Service(None, "test", EventProccess)
     }
-    mgr = ServiceMgr(services)
+    mgr = ServiceMgr(None, services)
 
     mgr.start()
 

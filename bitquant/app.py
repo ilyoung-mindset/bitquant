@@ -12,50 +12,31 @@ from bitquant.core import Service
 from bitquant.core import Events
 from bitquant.core import Worker
 from bitquant.core import Task
+from bitquant.core import App
+from bitquant.params import Params
 
 from bitquant.ex_broker import EXBroker
+from bitquant.ex_broker.huobi import HuobiWS
 
+from bitquant.rules import MarketInner
 
 routes = {
     'test': Worker.Router(),
+    'exbroker/huobiws': MarketInner.Router(),
+}
+
+ctx = {
+    'params': Params.params
 }
 
 services = {
-    'WorkerService': Worker.WorkerService(routes),
-    'EXBrokerService': EXBroker.EXBrokerService(),
+    'EXBrokerService': EXBroker.EXBrokerService(ctx),
+    'HuobiWSService': HuobiWS.HuobiWSService(ctx),
 }
 
-class App(object):
-    def __init__(self):
-        logging.basicConfig(level=logging.DEBUG,
-                            format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-                            datefmt='%a, %d %b %Y %H:%M:%S',
-                            filename='log/app.log',
-                            filemode='w')
+app = App.App(ctx, services, routes)
 
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-        console.setFormatter(formatter)
-        logging.getLogger('').addHandler(console)
-
-        self.servMgr = Service.ServiceMgr(services)
-
-    def run(self):
-        self.servMgr.start()
-
-        logging.info("bitquant startup.")
-
-        for num in range(1, 5):
-            task = Task.Task(self, 'test', str(num), "test task:"+str(num))
-            services['WorkerService'].taskQueue.put(task)
-            time.sleep(1)
-
-    def stop(self):
-        self.servMgr.stop()
-        logging.info('bitquant shutdown')
-
-app = App()
+ctx['app'] = app
 
 def appQuit(signum, frame):
     logging.warning('receive signal SIGTERM')
@@ -77,5 +58,3 @@ if __name__ == "__main__":
         run.do_action()
     else:
         app.run()
-
-

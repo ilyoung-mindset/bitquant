@@ -1,0 +1,45 @@
+{
+    "env":{
+        "type":"dev"
+    },
+    "log":{
+
+    },
+    "network": {
+        "http_proxy":{
+            "host":"10.1.2.12",
+            "port":8118
+        }
+    },
+    "db": {
+        "host":"",
+        "port":"",
+        "dbname":"",
+        "user":"",
+        "password":""
+        
+    },
+
+    "market": {
+        "huobi": {
+            "restapi": {
+                "url":"",
+                "appid":"",
+                "apikey":""
+            },
+            "websocket": {
+                "url":"wss://api.huobipro.com/ws",
+                "subs":[ 
+                    { "sub": "market.btcusdt.depth.step1", "id": "id10" },
+                    { "sub": "market.ethusdt.depth.step1", "id": "id10" }
+                ]
+            }
+        },
+        "okex": {
+
+        },
+        "gateio": {
+
+        }
+    }
+}

@@ -14,8 +14,8 @@ class Worker:
     def __init__(self, task):
         self.task = task
 
-    def run(self, task):
-        print("test worker:"+task.action)
+    def run(self):
+        print("test worker:"+self.task.action)
 
 class Router:
     def newWorker(self, task):
@@ -43,16 +43,16 @@ class WorkerThread(threading.Thread):
                 worker = self.ws.routes[task.action].newWorker(task)
                 if worker == None:
                     logging.error("create worker error")
-                    return
+                    continue
 
-                worker.run(task)
+                worker.run()
                 logging.debug("task["+task.action+"] end...")
             else: 
                 logging.warning("task["+task.action+"] not found.")
 
 class WorkerService(Service.Service):
-    def __init__(self, routes):
-        Service.Service.__init__(self, "Worker", EventProccess)
+    def __init__(self, ctx, routes):
+        Service.Service.__init__(self, ctx, "Worker", EventProccess)
         self.eventHandler = EventProccess
         self.taskQueue = queue.Queue()
         self.workThread = WorkerThread(self.taskQueue, self)
@@ -75,7 +75,7 @@ def EventProccess(e):
 
 if __name__ == "__main__":
     routes = {'test':Router()}
-    service = WorkerService(routes)
+    service = WorkerService(None, routes)
     service.start()
 
     for num in range(1, 5):
