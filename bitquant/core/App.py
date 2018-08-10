@@ -41,5 +41,4 @@ class App(object):
         logging.info('bitquant shutdown')
     
     def pubTask(self, ctx, action, id, data):
-        task = Task.Task(ctx, action, id, data)
-        self.services['WorkerService'].taskQueue.put(task)
+        self.services['WorkerService'].pubTask(ctx, action, id, data)

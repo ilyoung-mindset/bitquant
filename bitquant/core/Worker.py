@@ -39,14 +39,12 @@ class WorkerThread(threading.Thread):
                 break
             
             if self.ws.routes.__contains__(task.action):
-                logging.debug("task["+task.action+"] start...")
                 worker = self.ws.routes[task.action].newWorker(task)
                 if worker == None:
                     logging.error("create worker error")
                     continue
 
                 worker.run()
-                logging.debug("task["+task.action+"] end...")
             else: 
                 logging.warning("task["+task.action+"] not found.")
 
@@ -67,6 +65,10 @@ class WorkerService(Service.Service):
         self.taskQueue.put(quitTask)
 
         Service.Service.stop(self)
+    
+    def pubTask(self, ctx, action, id, data):
+        task = Task.Task(ctx, action, id, data)
+        self.taskQueue.put(task)
 
 
 def EventProccess(e):

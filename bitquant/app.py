@@ -17,12 +17,14 @@ from bitquant.params import Params
 
 from bitquant.ex_broker import EXBroker
 from bitquant.ex_broker.huobi import HuobiWS
+from bitquant.ex_broker.hadax import HadaxWS
 
 from bitquant.rules import MarketInner
 
 routes = {
     'test': Worker.Router(),
     'exbroker/huobiws': MarketInner.Router(),
+    'exbroker/hadaxws': MarketInner.Router(),
 }
 
 ctx = {
@@ -32,6 +34,7 @@ ctx = {
 services = {
     'EXBrokerService': EXBroker.EXBrokerService(ctx),
     'HuobiWSService': HuobiWS.HuobiWSService(ctx),
+    'HadaxWSService': HadaxWS.HadaxWSService(ctx),
 }
 
 app = App.App(ctx, services, routes)

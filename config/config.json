@@ -31,7 +31,23 @@
                 "url":"wss://api.huobipro.com/ws",
                 "subs":[ 
                     { "sub": "market.btcusdt.depth.step1", "id": "id10" },
-                    { "sub": "market.ethusdt.depth.step1", "id": "id10" }
+                    { "sub": "market.ethusdt.depth.step1", "id": "id10" },
+                    { "sub": "market.ethbtc.depth.step1", "id": "id10" }
+                ]
+            }
+        },
+        "hadax": {
+            "restapi": {
+                "url": "",
+                "appid": "",
+                "apikey": ""
+            },
+            "websocket": {
+                "url": "wss://api.hadax.com/ws",
+                "subs": [
+                    { "sub": "market.ethbtc.depth.step1", "id": "id10" },
+                    { "sub": "market.pntbtc.depth.step1", "id": "id10" },
+                    { "sub": "market.pnteth.depth.step1", "id": "id10" }
                 ]
             }
         },

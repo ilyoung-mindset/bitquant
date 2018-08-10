@@ -13,7 +13,7 @@ from bitquant.core import Service
 from bitquant.core import Events
 
 '''
-Huobi Market websocket API
+Hadax Market websocket API
 '''
 
 class WSThread(threading.Thread):
@@ -48,9 +48,10 @@ class WSThread(threading.Thread):
                     print(result)
 
                 else :
+                    print(result);
                     data = json.loads(result)
                     if data.__contains__('ch'):
-                        self.service.ctx['app'].pubTask(None, 'exbroker/huobiws', '0', data)
+                        self.service.ctx['app'].pubTask(None, 'exbroker/hadaxws', '0', data)
                     else:
                         logging.debug("data:"+result)
             
@@ -64,25 +65,25 @@ class WSThread(threading.Thread):
         while(1):
             proxy_host = self.service.ctx['params']['network']['http_proxy']['host']
             proxy_port = self.service.ctx['params']['network']['http_proxy']['port']
-            huobi_url = self.service.ctx['params']['market']['huobi']['websocket']['url']
+            hadax_url = self.service.ctx['params']['market']['hadax']['websocket']['url']
             self.ws = websocket.WebSocket()
 
             try:
                 if proxy_host == None:
-                    logging.debug("start connect :"+huobi_url)
-                    self.ws.connect(huobi_url)
+                    logging.debug("start connect :"+hadax_url)
+                    self.ws.connect(hadax_url)
                 else:
-                    logging.debug("start connect:["+huobi_url +
+                    logging.debug("start connect:["+hadax_url +
                                   "] proxy:[" + proxy_host+":"+str(proxy_port)+"]")
                     self.ws.connect(
-                        huobi_url, http_proxy_host=proxy_host, http_proxy_port=proxy_port)
+                        hadax_url, http_proxy_host=proxy_host, http_proxy_port=proxy_port)
                 break
             except:
                 logging.error('connect ws error,retry...')
                 time.sleep(5)
 
     def subTopics(self):
-        for reqData in self.service.ctx['params']['market']['huobi']['websocket']['subs']:
+        for reqData in self.service.ctx['params']['market']['hadax']['websocket']['subs']:
             json_str = json.dumps(reqData)
             logging.debug("sub :"+json_str)
             self.ws.send(json_str)
@@ -98,9 +99,9 @@ class WSThread(threading.Thread):
                 logging.debug("req :"+json_str)
                 self.ws.send(json_str)
 
-class HuobiWSService(Service.Service):
+class HadaxWSService(Service.Service):
     def __init__(self, ctx):
-        Service.Service.__init__(self, ctx, "HuobiWSService", EventProccess)
+        Service.Service.__init__(self, ctx, "HadaxWSService", EventProccess)
         self.eventHandler = EventProccess
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)
@@ -119,6 +120,6 @@ def EventProccess(e):
 
 
 if __name__ == "__main__":
-    service = HuobiWSService(None)
+    service = HadaxWSService(None)
     service.start()
 
