@@ -5,10 +5,10 @@
 # @QQ      : 375235513
 # @github  : https://github.com/KlausQIU
 
-from Utils import *
+from bitquant.ex_broker.huobi.Utils import *
 
 '''
-Market data API
+Huobi Market data API
 '''
 
 
