@@ -1,6 +1,11 @@
 {
-    "env":{
-        "type":"dev"
+    "app":{
+        "env":"dev",
+        "worker":{
+            "thread_min":10,
+            "thread_max":50,
+            "fifo_work_per_thread":3
+        }
     },
     "log":{
 

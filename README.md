@@ -1,23 +1,26 @@
 # Bitquant
 For digital currency quantitative transaction
-* 同一交易所不同板块套利
-* 不同交易所搬砖套利
-* 策略模型量化交易
+
+## Features
+
+* Get arbitrage profit in same market
+* Get arbitrage profit in different market
+* Tools for Quant
 
 # build
 ## python
 python verion: python3
-* 首先安装python3环境，
-* 安装pyton3 websocket 模块
+* install python3，
+* install `pyton3 websocket` module
 ```bash
  pip3 install websocket_client
 ```
-* 安装 python-deamon
+* install `python-deamon`
 ```bash
 python3 -m pip install 'python-daemon'
 ```
 
-## 运行
+## run app
 ```
 python3 -m bitquant.app
 ```

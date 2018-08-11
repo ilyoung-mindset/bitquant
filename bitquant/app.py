@@ -24,7 +24,7 @@ from bitquant.rules import MarketInner
 routes = {
     'test': Worker.Router(),
     'exbroker/huobiws': MarketInner.Router(),
-    'exbroker/hadaxws': MarketInner.Router(),
+    'exbroker/hadaxws': MarketInner.Router({'fifo':True}),
 }
 
 ctx = {
