@@ -23,13 +23,21 @@ from bitquant.ex_broker.lbank import LbankWS
 
 from bitquant.rules import MarketInner
 from bitquant.ex_broker import EXTradeWorker
+from bitquant.ex_broker import EXMarketWorker
+from bitquant.ex_broker import EXDepthWorker
 
 routes = {
     'test': Worker.Router(),
-    #'exbroker/huobi/ws/depth': MarketInner.Router({'fifo': True}),
-    #'exbroker/hadax/ws/depth': MarketInner.Router({'fifo': True}),
+    'exbroker/huobi/ws/depth': EXDepthWorker.Router(),
+    'exbroker/huobi/ws/kline': EXMarketWorker.Router(),
+
+    'exbroker/hadax/ws/depth': EXDepthWorker.Router(),
+    'exbroker/hadax/ws/kline': EXMarketWorker.Router(),
     'exbroker/hadax/ws/trade': EXTradeWorker.Router(),
+    
     #'exbroker/lbank/ws': EXTradeWorker.Router(),
+
+    'exbroker/hadax/ws/depth': MarketInner.Router({'fifo': True}),
 }
 
 ctx = {
@@ -38,8 +46,8 @@ ctx = {
 
 services = {
     'EXBrokerService': EXBroker.EXBrokerService(ctx),
-    'HuobiWSService': HuobiWS.HuobiWSService(ctx),
-    'HadaxWSService': HadaxWS.HadaxWSService(ctx),
+    'HuobiWSService': HuobiWS.HuobiWSService(ctx, Params.paramsHuobi.params),
+    'HadaxWSService': HadaxWS.HadaxWSService(ctx, Params.paramsHadax.params),
     #'LbankWSService': LbankWS.LbankWSService(ctx),
 }
 

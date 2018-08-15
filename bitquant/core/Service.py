@@ -31,7 +31,7 @@ class ServiceThread(threading.Thread):
             
 
 class Service:
-    def __init__(self, ctx, name, proccess, params={}):
+    def __init__(self, ctx, name, proccess, params=None):
         self.ctx = ctx
         self.eventQueue = queue.Queue()
         self.name = name

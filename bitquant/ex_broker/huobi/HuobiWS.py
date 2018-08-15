@@ -61,7 +61,7 @@ class WSThread(threading.Thread):
                                 continue
 
                         self.lastMsgID[data['ch']] = data['ts']
-                        
+
                         chs = data['ch'].split('.')
                         ch = chs[2]
                         self.service.ctx['app'].pubTask(
@@ -77,9 +77,12 @@ class WSThread(threading.Thread):
     def connect(self):
         logging.debug("worker run ...")
         while(1):
-            proxy_host = self.service.ctx['params']['network']['http_proxy']['host']
-            proxy_port = self.service.ctx['params']['network']['http_proxy']['port']
-            huobi_url = self.service.ctx['params']['market']['huobi']['websocket']['url']
+            proxy_host = None
+            if self.service.params['http_proxy_host'] != None:
+                proxy_host = self.service.params['http_proxy_host']
+                proxy_port = self.service.params['http_proxy_port']
+
+            huobi_url = self.service.params['websocket']['url']
             self.ws = websocket.WebSocket()
 
             try:
@@ -97,7 +100,7 @@ class WSThread(threading.Thread):
                 time.sleep(5)
 
     def subTopics(self):
-        for reqData in self.service.ctx['params']['market']['huobi']['websocket']['subs']:
+        for reqData in self.service.params['websocket']['subs']:
             json_str = json.dumps(reqData)
             logging.debug("sub :"+json_str)
             self.ws.send(json_str)
@@ -114,8 +117,9 @@ class WSThread(threading.Thread):
                 self.ws.send(json_str)
 
 class HuobiWSService(Service.Service):
-    def __init__(self, ctx):
-        Service.Service.__init__(self, ctx, "HuobiWSService", EventProccess)
+    def __init__(self, ctx, params=None):
+        Service.Service.__init__(
+            self, ctx, "HuobiWSService", EventProccess, params)
         self.eventHandler = EventProccess
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)

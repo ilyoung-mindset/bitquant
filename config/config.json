@@ -37,7 +37,25 @@
                 "subs":[ 
                     { "sub": "market.btcusdt.depth.step0", "id": "id10" },
                     { "sub": "market.ethusdt.depth.step0", "id": "id10" },
-                    { "sub": "market.ethbtc.depth.step0", "id": "id10" }
+                    { "sub": "market.ethbtc.depth.step0", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.1min", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.5min", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.15min", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.30min", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.60min", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.4hour", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.1day", "id": "id10" },
+                    { "sub": "market.ethusdt.kline.1mon", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.1week", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.1min", "id": "id10" }, 
+                    { "sub": "market.btcusdt.kline.5min", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.15min", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.30min", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.60min", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.4hour", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.1day", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.1mon", "id": "id10" },
+                    { "sub": "market.btcusdt.kline.1week", "id": "id10" }
                 ]
             }
         },
@@ -53,7 +71,16 @@
                     { "sub": "market.pntbtc.depth.step0", "id": "id10" },
                     { "sub": "market.pnteth.depth.step0", "id": "id10" },
                     { "sub": "market.pntbtc.trade.detail", "id": "id10" },
-                    { "sub": "market.pnteth.trade.detail", "id": "id10" }
+                    { "sub": "market.pnteth.trade.detail", "id": "id10" },
+                    { "sub": "market.pnteth.kline.1min", "id": "id10" },
+                    { "sub": "market.pnteth.kline.5min", "id": "id10" },
+                    { "sub": "market.pnteth.kline.15min", "id": "id10" },
+                    { "sub": "market.pnteth.kline.30min", "id": "id10" },
+                    { "sub": "market.pnteth.kline.60min", "id": "id10" },
+                    { "sub": "market.pnteth.kline.4hour", "id": "id10" },
+                    { "sub": "market.pnteth.kline.1day", "id": "id10" },
+                    { "sub": "market.pnteth.kline.1mon", "id": "id10" },
+                    { "sub": "market.pnteth.kline.1week", "id": "id10" }
                 ]
             }
         },
