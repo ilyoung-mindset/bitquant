@@ -20,7 +20,7 @@ class WSThread(threading.Thread):
     def __init__(self, q, service):
         threading.Thread.__init__(self)
         self.service = service
-
+        self.lastMsgID = {}
         # 初始化
         self.eventQueue = q
 
@@ -35,7 +35,12 @@ class WSThread(threading.Thread):
     def process(self):
         
         while(1):
-            compressData = self.ws.recv()
+            try:
+                compressData = self.ws.recv()
+            except BaseException as e:
+                logging.error(e)
+                return False
+            
             result = gzip.decompress(compressData).decode('utf-8')
             if result[:7] == '{"ping"':
                 ts = result[8:21]
@@ -48,10 +53,19 @@ class WSThread(threading.Thread):
                     print(result)
 
                 else :
-                    print(result);
+                   # print("raw: "+result);
                     data = json.loads(result)
                     if data.__contains__('ch'):
-                        self.service.ctx['app'].pubTask(None, 'exbroker/hadaxws', '0', data)
+                        if self.lastMsgID.__contains__(data['ch']):
+                            if self.lastMsgID[data['ch']] == data['ts']:
+                                continue
+                        
+                        self.lastMsgID[data['ch']] = data['ts']
+
+                        chs = data['ch'].split('.')
+                        ch = chs[2]
+                        self.service.ctx['app'].pubTask(
+                            None, 'exbroker/hadax/ws/'+ch, '0', data)
                     else:
                         logging.debug("data:"+result)
             

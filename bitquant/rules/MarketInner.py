@@ -10,7 +10,7 @@ markets = {
 
 tx_rules = [
     #{'middle': 'eth', 'main': 'usdt', 'second':'btc', 'get': 'usdt', 'market': [ 'ethusdt', 'btcusdt', 'ethbtc'], 'water_heigh': 10, 'water_low': 0.5},
-    {'middle': 'pnt', 'main': 'btc', 'second':'eth', 'get': 'pnt', 'market': ['pntbtc', 'ethbtc', 'pnteth'], 'water_heigh': 1000000, 'water_low':100000},
+    {'middle': 'pnt', 'main': 'btc', 'second':'eth', 'get': 'pnt', 'market': ['pntbtc', 'ethbtc', 'pnteth'], 'water_heigh': 1000000, 'water_low':10000},
 ]
 
 class MarketInnerWorker(Worker.Worker):
@@ -24,7 +24,7 @@ class MarketInnerWorker(Worker.Worker):
         markets[ch] = self.task.data
         
         for rule in tx_rules:
-            if(not rule['market'].__contains__(ch)):
+            if not rule['market'].__contains__(ch) :
                 continue
             
             if not markets.__contains__(rule['market'][0]):

@@ -4,6 +4,7 @@ import logging
 from bitquant.core import Service
 from bitquant.core import Events
 
+
 '''
 Market data API
 '''
@@ -16,7 +17,8 @@ class EXBrokerService(Service.Service):
 
 def EventProccess(e):
     logging.debug(e.data)
-    
+  
+
 if __name__ == "__main__":
     service = EXBrokerService(None)
     service.start()

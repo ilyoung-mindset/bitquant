@@ -17,11 +17,11 @@
         }
     },
     "db": {
-        "host":"",
-        "port":"",
-        "dbname":"",
-        "user":"",
-        "password":""
+        "host":"10.1.3.96",
+        "port":"3306",
+        "dbname":"BITQUANT_TEST",
+        "user":"bitquant",
+        "password":"bitquant"
         
     },
 
@@ -35,9 +35,9 @@
             "websocket": {
                 "url":"wss://api.huobipro.com/ws",
                 "subs":[ 
-                    { "sub": "market.btcusdt.depth.step1", "id": "id10" },
-                    { "sub": "market.ethusdt.depth.step1", "id": "id10" },
-                    { "sub": "market.ethbtc.depth.step1", "id": "id10" }
+                    { "sub": "market.btcusdt.depth.step0", "id": "id10" },
+                    { "sub": "market.ethusdt.depth.step0", "id": "id10" },
+                    { "sub": "market.ethbtc.depth.step0", "id": "id10" }
                 ]
             }
         },
@@ -50,9 +50,25 @@
             "websocket": {
                 "url": "wss://api.hadax.com/ws",
                 "subs": [
-                    { "sub": "market.ethbtc.depth.step1", "id": "id10" },
-                    { "sub": "market.pntbtc.depth.step1", "id": "id10" },
-                    { "sub": "market.pnteth.depth.step1", "id": "id10" }
+                    { "sub": "market.pntbtc.depth.step0", "id": "id10" },
+                    { "sub": "market.pnteth.depth.step0", "id": "id10" },
+                    { "sub": "market.pntbtc.trade.detail", "id": "id10" },
+                    { "sub": "market.pnteth.trade.detail", "id": "id10" }
+                ]
+            }
+        },
+
+        "lbank": {
+            "restapi": {
+                "url": "",
+                "appid": "",
+                "apikey": ""
+            },
+            "websocket": {
+                "url": "ws://api.lbank.info/ws/V2/",
+                "subs": [
+                    { "action": "subscribe", "subscribe": "depth", "depth": 10, "pair": "pnt_btc" },
+                    { "action": "subscribe", "subscribe": "depth", "depth": 10, "pair": "pnt_eth" }
                 ]
             }
         },

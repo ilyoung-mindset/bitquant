@@ -13,14 +13,13 @@ from bitquant.core import Service
 from bitquant.core import Events
 
 '''
-Huobi Market websocket API
+Lbank Market websocket API
 '''
 
 class WSThread(threading.Thread):
     def __init__(self, q, service):
         threading.Thread.__init__(self)
         self.service = service
-        self.lastMsgID = {}
 
         # 初始化
         self.eventQueue = q
@@ -36,16 +35,11 @@ class WSThread(threading.Thread):
     def process(self):
         
         while(1):
-            try:
-                compressData = self.ws.recv()
-            except BaseException as e:
-                logging.error(e)
-                return False
-            
-            result = gzip.decompress(compressData).decode('utf-8')
-            if result[:7] == '{"ping"':
-                ts = result[8:21]
-                pong = '{"pong":'+ts+'}'
+            result = self.ws.recv()
+            #result = gzip.decompress(compressData).decode('utf-8')
+            data = json.loads(result)
+            if data.__contains__('action') and data['action'] == 'ping':
+                pong = '{"action": "pong", "pong": "'+data['ping']+'"}'
                 self.ws.send(pong)
                 self.subTopics()
 
@@ -54,18 +48,9 @@ class WSThread(threading.Thread):
                     print(result)
 
                 else :
-                    data = json.loads(result)
-                    if data.__contains__('ch'):
-                        if self.lastMsgID.__contains__(data['ch']):
-                            if self.lastMsgID[data['ch']] == data['ts']:
-                                continue
-
-                        self.lastMsgID[data['ch']] = data['ts']
-                        
-                        chs = data['ch'].split('.')
-                        ch = chs[2]
-                        self.service.ctx['app'].pubTask(
-                            None, 'exbroker/huobi/ws/'+ch, '0', data)
+                    #print("raw: "+result);
+                    if data.__contains__('pair'):
+                        self.service.ctx['app'].pubTask(None, 'exbroker/lbank/ws', '0', data)
                     else:
                         logging.debug("data:"+result)
             
@@ -79,25 +64,25 @@ class WSThread(threading.Thread):
         while(1):
             proxy_host = self.service.ctx['params']['network']['http_proxy']['host']
             proxy_port = self.service.ctx['params']['network']['http_proxy']['port']
-            huobi_url = self.service.ctx['params']['market']['huobi']['websocket']['url']
+            lbank_url = self.service.ctx['params']['market']['lbank']['websocket']['url']
             self.ws = websocket.WebSocket()
 
             try:
                 if proxy_host == None:
-                    logging.debug("start connect :"+huobi_url)
-                    self.ws.connect(huobi_url)
+                    logging.debug("start connect :"+lbank_url)
+                    self.ws.connect(lbank_url)
                 else:
-                    logging.debug("start connect:["+huobi_url +
+                    logging.debug("start connect:["+lbank_url +
                                   "] proxy:[" + proxy_host+":"+str(proxy_port)+"]")
                     self.ws.connect(
-                        huobi_url, http_proxy_host=proxy_host, http_proxy_port=proxy_port)
+                        lbank_url, http_proxy_host=proxy_host, http_proxy_port=proxy_port)
                 break
             except:
                 logging.error('connect ws error,retry...')
                 time.sleep(5)
 
     def subTopics(self):
-        for reqData in self.service.ctx['params']['market']['huobi']['websocket']['subs']:
+        for reqData in self.service.ctx['params']['market']['lbank']['websocket']['subs']:
             json_str = json.dumps(reqData)
             logging.debug("sub :"+json_str)
             self.ws.send(json_str)
@@ -113,9 +98,9 @@ class WSThread(threading.Thread):
                 logging.debug("req :"+json_str)
                 self.ws.send(json_str)
 
-class HuobiWSService(Service.Service):
+class LbankWSService(Service.Service):
     def __init__(self, ctx):
-        Service.Service.__init__(self, ctx, "HuobiWSService", EventProccess)
+        Service.Service.__init__(self, ctx, "LbankWSService", EventProccess)
         self.eventHandler = EventProccess
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)
@@ -134,6 +119,6 @@ def EventProccess(e):
 
 
 if __name__ == "__main__":
-    service = HuobiWSService(None)
+    service = LbankWSService(None)
     service.start()
 

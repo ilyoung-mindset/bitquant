@@ -11,6 +11,7 @@ from daemon.runner import DaemonRunner
 from bitquant.core import Service
 from bitquant.core import Events
 from bitquant.core import Worker
+
 from bitquant.core import Task
 from bitquant.core import App
 from bitquant.params import Params
@@ -18,13 +19,17 @@ from bitquant.params import Params
 from bitquant.ex_broker import EXBroker
 from bitquant.ex_broker.huobi import HuobiWS
 from bitquant.ex_broker.hadax import HadaxWS
+from bitquant.ex_broker.lbank import LbankWS
 
 from bitquant.rules import MarketInner
+from bitquant.ex_broker import EXTradeWorker
 
 routes = {
     'test': Worker.Router(),
-    'exbroker/huobiws': MarketInner.Router(),
-    'exbroker/hadaxws': MarketInner.Router({'fifo':True}),
+    #'exbroker/huobi/ws/depth': MarketInner.Router({'fifo': True}),
+    #'exbroker/hadax/ws/depth': MarketInner.Router({'fifo': True}),
+    'exbroker/hadax/ws/trade': EXTradeWorker.Router(),
+    #'exbroker/lbank/ws': EXTradeWorker.Router(),
 }
 
 ctx = {
@@ -35,6 +40,7 @@ services = {
     'EXBrokerService': EXBroker.EXBrokerService(ctx),
     'HuobiWSService': HuobiWS.HuobiWSService(ctx),
     'HadaxWSService': HadaxWS.HadaxWSService(ctx),
+    #'LbankWSService': LbankWS.LbankWSService(ctx),
 }
 
 app = App.App(ctx, services, routes)

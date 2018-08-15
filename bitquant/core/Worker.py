@@ -19,9 +19,10 @@ class Worker:
 
 
 class Work:
-    def __init__(self, worker, task):
+    def __init__(self, worker, task, params={}):
         self.worker = worker
         self.task = task
+        self.params = params
 
 class Router:
     def __init__(self, options={}):
