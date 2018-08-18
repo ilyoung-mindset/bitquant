@@ -460,7 +460,7 @@ class HuobiREST:
         if self.params['http_proxy_host'] == None:
             response = requests.get( url, postdata, headers=headers, timeout=5)
         else:
-            http_proxy = self.params['http_proxy_host']+':'+self.params['http_proxy_port']
+            http_proxy = self.params['http_proxy_host']+':'+str(self.params['http_proxy_port'])
             proxies = {'http': http_proxy, 'https': http_proxy}
             response = requests.get( url, postdata, headers=headers, timeout=5, proxies=proxies)
 
@@ -546,7 +546,7 @@ class HuobiREST:
 if __name__ == '__main__':
     params = {}
     params['http_proxy_host'] = '10.1.2.12'
-    params['http_proxy_port'] = '8118'
+    params['http_proxy_port'] = 8118
     huobi_rest = HuobiREST(params=params)
-    print(huobi_rest.get_kline('pnteth', '1min', 1000))
+    print(huobi_rest.get_kline('ethusdt', '1day', 1000))
     #print(huobi_rest.get_accounts())

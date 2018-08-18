@@ -115,9 +115,9 @@ class WSThread(threading.Thread):
                 logging.debug("req :"+json_str)
                 self.ws.send(json_str)
 
-class HadaxWSService(Service.Service):
+class HadaxService(Service.Service):
     def __init__(self, ctx, params=None):
-        Service.Service.__init__(self, ctx, "HadaxWSService", EventProccess, params)
+        Service.Service.__init__(self, ctx, "HadaxService", EventProccess, params)
         self.eventHandler = EventProccess
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)
@@ -137,6 +137,6 @@ def EventProccess(e, service=None):
 
 
 if __name__ == "__main__":
-    service = HadaxWSService(None)
+    service = HadaxService(None)
     service.start()
 

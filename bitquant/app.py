@@ -30,6 +30,7 @@ routes = {
     'test': Worker.Router(),
     'exbroker/huobi/ws/depth': EXDepthWorker.Router(),
     'exbroker/huobi/ws/kline': EXMarketWorker.Router(),
+    'exbroker/huobi/rest/kline': EXMarketWorker.Router(),
 
     'exbroker/hadax/ws/depth': EXDepthWorker.Router(),
     'exbroker/hadax/ws/kline': EXMarketWorker.Router(),
@@ -45,10 +46,10 @@ ctx = {
 }
 
 services = {
-    'EXBrokerService': ex_broker_service.EXBrokerService(ctx),
-    'HuobiWSService': huobi_service.HuobiWSService(ctx, Params.paramsHuobi.params),
-    'HadaxWSService': hadax_service.HadaxWSService(ctx, Params.paramsHadax.params),
+    'HuobiService': huobi_service.HuobiService(ctx, Params.paramsHuobi.params),
+    'HadaxService': hadax_service.HadaxService(ctx, Params.paramsHadax.params),
     #'LbankWSService': LbankWS.LbankWSService(ctx),
+    'EXBrokerService': ex_broker_service.EXBrokerService(ctx),
 }
 
 app = App.App(ctx, services, routes)

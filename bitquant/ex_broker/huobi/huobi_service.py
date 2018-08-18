@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#author: 半熟的韭菜
 import threading
 import time
 import logging
@@ -118,19 +117,19 @@ class WSThread(threading.Thread):
                 logging.debug("req :"+json_str)
                 self.ws.send(json_str)
 
-class HuobiWSService(Service.Service):
+class HuobiService(Service.Service):
     def __init__(self, ctx, params=None):
         Service.Service.__init__(
-            self, ctx, "HuobiWSService", EventProccess, params)
+            self, ctx, "HuobiService", EventProccess, params)
         self.eventHandler = EventProccess
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)
-        
-        ctx['app'].evt_mng.sub_event('market.huobi.get', self)
 
     def start(self):
         Service.Service.start(self)
         self.WSThread.start()
+
+        self.ctx['app'].evt_mng.sub_event('market.huobi.get', self)
 
     def stop(self):
         ev = Events.Event('quit', str(1), "quit request")
@@ -146,6 +145,6 @@ def EventProccess(e, service=None):
 
 
 if __name__ == "__main__":
-    service = HuobiWSService(None)
+    service = HuobiService(None)
     service.start()
 

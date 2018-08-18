@@ -27,5 +27,10 @@ class EventMananger:
         del self.events[event_id]
     
     def pub_event(self, ev):
+        print(self.events)
         if self.events.__contains__(ev.event):
+            print(ev.event)
             self.events[ev.event].eventQueue.put(ev)
+            return True
+            
+        return False

@@ -36,7 +36,7 @@ class Service:
         self.ctx = ctx
         self.eventQueue = queue.Queue()
         self.name = name
-        self.thread = ServiceThread(self.name, self, self.eventQueue, proccess)
+        self.thread = ServiceThread(self, self.name, self.eventQueue, proccess)
         self.params = params
         
     def before_start(self):
@@ -46,12 +46,8 @@ class Service:
         pass
 
     def start(self):
-        self.before_start()
         logging.debug("service["+self.name+"] start ...")
         self.thread.start()
-        self.after_start()
-    
-   
 
     def before_stop(self):
         pass
@@ -74,16 +70,19 @@ class ServiceMgr:
     def start(self):
         for k in self.services.keys():
             service = self.services[k]
+            service.before_start()
             service.start()
+            service.before_stop()
+
 
     def stop(self):
         for k in self.services.keys():
             service = self.services[k]
+            service.before_stop()
             service.stop()
 
 def EventProccess(e):
-        print(e.data)
-
+    print(e.data)
 
 if __name__ == "__main__":
     services = {
