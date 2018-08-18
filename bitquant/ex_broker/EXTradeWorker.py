@@ -35,7 +35,6 @@ class EXTradeWorker(Worker.Worker):
                 market, symbol, record['price'], record['amount'], record['ts'], record['direction'], record['id'], date, datetime)
 
             try:
-                
                 cursor.execute(sql)
                 db.commit()
             except BaseException as e:

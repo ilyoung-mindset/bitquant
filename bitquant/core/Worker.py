@@ -127,7 +127,7 @@ class WorkerService(Service.Service):
         self.routesQueue[action].put(worker)
 
 
-def EventProccess(e):
+def EventProccess(e, service=None):
     logging.debug(e.data)
 
 

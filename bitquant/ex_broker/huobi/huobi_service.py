@@ -12,6 +12,8 @@ import json
 from bitquant.core import Service
 from bitquant.core import Events
 
+from bitquant.ex_broker.huobi import huobi_rest
+
 '''
 Huobi Market websocket API
 '''
@@ -123,6 +125,8 @@ class HuobiWSService(Service.Service):
         self.eventHandler = EventProccess
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)
+        
+        ctx['app'].evt_mng.sub_event('market.huobi.get', self)
 
     def start(self):
         Service.Service.start(self)
@@ -133,8 +137,12 @@ class HuobiWSService(Service.Service):
         self.WSQueue.put(ev)
         Service.Service.stop(self)
 
-def EventProccess(e):
-    logging.debug(e.data)
+def EventProccess(e, service=None):
+    if e.event == 'market.huobi.get': 
+        if e.data['topic'] == 'kline':
+            huobi = huobi_rest.HuobiREST(params=service.params)
+            data = huobi.get_kline(e.data['symbol'], e.data['period'], e.data['size'])
+            service.ctx['app'].pubTask(None, 'exbroker/huobi/rest/kline', '0', data)
 
 
 if __name__ == "__main__":

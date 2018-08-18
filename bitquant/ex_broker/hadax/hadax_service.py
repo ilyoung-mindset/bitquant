@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#author: 半熟的韭菜
 import threading
 import time
 import logging
@@ -132,7 +131,8 @@ class HadaxWSService(Service.Service):
         self.WSQueue.put(ev)
         Service.Service.stop(self)
 
-def EventProccess(e):
+
+def EventProccess(e, service=None):
     logging.debug(e.data)
 
 

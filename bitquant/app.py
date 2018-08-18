@@ -16,9 +16,9 @@ from bitquant.core import Task
 from bitquant.core import App
 from bitquant.params import Params
 
-from bitquant.ex_broker import EXBroker
-from bitquant.ex_broker.huobi import HuobiWS
-from bitquant.ex_broker.hadax import HadaxWS
+from bitquant.ex_broker import ex_broker_service
+from bitquant.ex_broker.huobi import huobi_service
+from bitquant.ex_broker.hadax import hadax_service
 from bitquant.ex_broker.lbank import LbankWS
 
 from bitquant.rules import MarketInner
@@ -45,9 +45,9 @@ ctx = {
 }
 
 services = {
-    'EXBrokerService': EXBroker.EXBrokerService(ctx),
-    'HuobiWSService': HuobiWS.HuobiWSService(ctx, Params.paramsHuobi.params),
-    'HadaxWSService': HadaxWS.HadaxWSService(ctx, Params.paramsHadax.params),
+    'EXBrokerService': ex_broker_service.EXBrokerService(ctx),
+    'HuobiWSService': huobi_service.HuobiWSService(ctx, Params.paramsHuobi.params),
+    'HadaxWSService': hadax_service.HadaxWSService(ctx, Params.paramsHadax.params),
     #'LbankWSService': LbankWS.LbankWSService(ctx),
 }
 

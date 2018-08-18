@@ -10,13 +10,14 @@ project Service base class
 '''
 
 class ServiceThread(threading.Thread):
-    def __init__(self, name, q, handler):
+    def __init__(self, service, name, q, handler):
         threading.Thread.__init__(self)
         # 初始化
         # self.threadID = threadID
         self.name = name
         self.eventQueue = q
         self.eventHandler = handler
+        self.service = service
 
     def run(self):
         logging.debug("service run ...")
@@ -27,7 +28,7 @@ class ServiceThread(threading.Thread):
                 logging.info('service['+self.name+'] quit')
                 break
             
-            self.eventHandler(ev)
+            self.eventHandler(ev, service=self.service)
             
 
 class Service:
@@ -35,18 +36,33 @@ class Service:
         self.ctx = ctx
         self.eventQueue = queue.Queue()
         self.name = name
-        self.thread = ServiceThread(self.name, self.eventQueue, proccess)
+        self.thread = ServiceThread(self.name, self, self.eventQueue, proccess)
         self.params = params
         
+    def before_start(self):
+        pass
+
+    def after_start(self):
+        pass
 
     def start(self):
+        self.before_start()
         logging.debug("service["+self.name+"] start ...")
         self.thread.start()
+        self.after_start()
     
+   
+
+    def before_stop(self):
+        pass
+
     def stop(self):
+        self.before_stop()
         logging.debug("service["+self.name+"] stop ...")
+        
         ev = Events.Event('quit', str(1), "quit request")
         self.eventQueue.put(ev)
+    
     
 
 

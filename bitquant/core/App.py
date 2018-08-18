@@ -24,6 +24,7 @@ class App(object):
         self.ctx = ctx
 
         self.routes = routes
+        self.evt_mng = Events.EventMananger()
 
         self.services = services
         self.services['WorkerService'] = Worker.WorkerService(
