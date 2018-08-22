@@ -3,10 +3,10 @@ import json
 import pymysql.cursors
 import threading
 import time
-from bitquant.core import Task
-from bitquant.core import Worker
+from bitquant.core import worker
 
-class EXTradeWorker(Worker.Worker):
+
+class EXTradeWorker(worker.Worker):
     def run(self):
         data = self.task.data
         
@@ -43,8 +43,3 @@ class EXTradeWorker(Worker.Worker):
                 db.rollback()
 
         db.close()
-
-
-class Router(Worker.Router):
-    def newWorker(self, task):
-        return EXTradeWorker(task)

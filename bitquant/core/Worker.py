@@ -2,17 +2,24 @@ import threading
 import time
 import queue
 import logging
-from bitquant.core import Service
-from bitquant.core import Events
-from bitquant.core import Task
+from bitquant.core import service
 
 '''
 Market data API
 '''
 
+class Task:
+    def __init__(self, ctx, action, id, data):
+        self.ctx = ctx
+
+        self.action = action
+        self.id = id
+        self.data = data
+
 class Worker:
-    def __init__(self, task):
+    def __init__(self, task, options=None):
         self.task = task
+        self.options = options
 
     def run(self):
         print("test worker:"+self.task.action)
@@ -25,11 +32,12 @@ class Work:
         self.params = params
 
 class Router:
-    def __init__(self, options={}):
+    def __init__(self, worker_class, options={}):
+        self.worker_class = worker_class
         self.options = options
 
     def newWorker(self, task):
-        return Worker(task)
+        return self.worker_class(task)
     
 class WorkerThread(threading.Thread):
     def __init__(self, threadID, q, ws):
@@ -54,11 +62,10 @@ class WorkerThread(threading.Thread):
             worker.run()
             
             
-
-class WorkerService(Service.Service):
-    def __init__(self, ctx, routes):
-        Service.Service.__init__(self, ctx, "Worker", EventProccess)
-        self.eventHandler = EventProccess
+class WorkerService(service.Service):
+    def __init__(self, ctx, routes, params=None):
+        service.Service.__init__(self, ctx, "Worker", params)
+        self.eventHandler = self.event_process
         self.taskQueue = queue.Queue()
         self.routesQueue = {}
         self.workFifoThreads = []
@@ -101,20 +108,20 @@ class WorkerService(Service.Service):
         
 
     def start(self):
-        Service.Service.start(self)
+        service.Service.start(self)
         for t in self.workThreads:
             t.start()
     
     def stop(self):
-        quitTask = Task.Task(self, 'quit', str(0), "quit task thread")
+        quitTask = Task(self, 'quit', str(0), "quit task thread")
         worker = Worker(quitTask)
         for t in self.workThreads:
             t.taskQueue.put(worker)
 
-        Service.Service.stop(self)
+        service.Service.stop(self)
     
-    def pubTask(self, ctx, action, id, data):
-        task = Task.Task(ctx, action, id, data)
+    def pub_task(self, ctx, action, id, data):
+        task = Task(ctx, action, id, data)
         if not self.routes.__contains__(task.action):
             logging.warning("task["+task.action+"] not found.")
             return False
@@ -126,9 +133,8 @@ class WorkerService(Service.Service):
         
         self.routesQueue[action].put(worker)
 
-
-def EventProccess(e, service=None):
-    logging.debug(e.data)
+    def event_process(self, e, service=None):
+        logging.debug(e.data)
 
 
 if __name__ == "__main__":
@@ -137,7 +143,7 @@ if __name__ == "__main__":
     service.start()
 
     for num in range(1, 5):
-        service.pubTask(service, 'test', str(num), "test task:"+str(num))
+        service.pub_task(service, 'test', str(num), "test task:"+str(num))
         time.sleep(1)
 
     service.stop()

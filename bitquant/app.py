@@ -8,37 +8,32 @@ import logging
 import optparse
 from daemon.runner import DaemonRunner
 
-from bitquant.core import Service
-from bitquant.core import Events
-from bitquant.core import Worker
+from bitquant.core import worker
 
-from bitquant.core import Task
 from bitquant.core import App
 from bitquant.params import Params
 
 from bitquant.ex_broker import ex_broker_service
 from bitquant.ex_broker.huobi import huobi_service
 from bitquant.ex_broker.hadax import hadax_service
-from bitquant.ex_broker.lbank import LbankWS
+from bitquant.ex_broker.lbank import lbank_service
 
-from bitquant.rules import MarketInner
-from bitquant.ex_broker import EXTradeWorker
-from bitquant.ex_broker import EXMarketWorker
-from bitquant.ex_broker import EXDepthWorker
+from bitquant.rules import inner_market_tick
+from bitquant.ex_broker import market_trade_worker
+from bitquant.ex_broker import market_kline_woker
+from bitquant.ex_broker import market_depth_worker
 
 routes = {
-    'test': Worker.Router(),
-    'exbroker/huobi/ws/depth': EXDepthWorker.Router(),
-    'exbroker/huobi/ws/kline': EXMarketWorker.Router(),
-    'exbroker/huobi/rest/kline': EXMarketWorker.Router(),
-
-    'exbroker/hadax/ws/depth': EXDepthWorker.Router(),
-    'exbroker/hadax/ws/kline': EXMarketWorker.Router(),
-    'exbroker/hadax/ws/trade': EXTradeWorker.Router(),
+    'exbroker/huobi/ws/depth': worker.Router(market_depth_worker.EXDepthWorker),
+    'exbroker/huobi/ws/kline': worker.Router(market_kline_woker.EXMarketWorker),
+    'exbroker/huobi/rest/kline': worker.Router(market_kline_woker.EXMarketWorker),
+    'exbroker/hadax/ws/depth': worker.Router(market_depth_worker.EXDepthWorker),
+    'exbroker/hadax/ws/kline': worker.Router(market_kline_woker.EXMarketWorker),
+    'exbroker/hadax/ws/trade': worker.Router(market_trade_worker.EXTradeWorker),
     
-    #'exbroker/lbank/ws': EXTradeWorker.Router(),
+    #'exbroker/lbank/ws': worker.Router(market_trade_worker.EXTradeWorker),
 
-    'exbroker/hadax/ws/depth': MarketInner.Router({'fifo': True}),
+    'exbroker/hadax/ws/depth': worker.Router(inner_market_tick.MarketInnerWorker, {'fifo': True}),
 }
 
 ctx = {
@@ -48,7 +43,7 @@ ctx = {
 services = {
     'HuobiService': huobi_service.HuobiService(ctx, Params.paramsHuobi.params),
     'HadaxService': hadax_service.HadaxService(ctx, Params.paramsHadax.params),
-    #'LbankWSService': LbankWS.LbankWSService(ctx),
+    #'LbankWSService': lbank_service.LbankWSService(ctx),
     'EXBrokerService': ex_broker_service.EXBrokerService(ctx),
 }
 

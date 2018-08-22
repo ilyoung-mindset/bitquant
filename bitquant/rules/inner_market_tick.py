@@ -1,8 +1,7 @@
 import logging
 import json
 
-from bitquant.core import Task
-from bitquant.core import Worker
+from bitquant.core import worker
 
 markets = {
 
@@ -13,7 +12,7 @@ tx_rules = [
     {'middle': 'pnt', 'main': 'btc', 'second':'eth', 'get': 'pnt', 'market': ['pntbtc', 'ethbtc', 'pnteth'], 'water_heigh': 1000000, 'water_low':10000},
 ]
 
-class MarketInnerWorker(Worker.Worker):
+class MarketInnerWorker(worker.Worker):
     def run(self):
       
         if not self.task.data.__contains__('ch'):
@@ -67,9 +66,3 @@ class MarketInnerWorker(Worker.Worker):
             print("B "+rule['middle']+":"+'{:.5f}'.format(c) + "  "+rule['second']+":"+'{:.5f}'.format(b1) + "  "+rule['main']+":"+'{:.5f}'.format(
                 b2)+"   "+rule['middle']+":"+'{:.5f}'.format(b3)+"  ["+rule['middle']+" gap:"+'{:.5f}'.format(gap)+"  "+'{:.3f}'.format(gap/c)+"]")
             
-
-class Router(Worker.Router):
-    def newWorker(self, task):
-        return MarketInnerWorker(task)
-
-    

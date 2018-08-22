@@ -3,7 +3,7 @@ import time
 import queue
 import logging
 
-from bitquant.core import Events
+from bitquant.core import events
 
 '''
 project Service base class
@@ -32,11 +32,12 @@ class ServiceThread(threading.Thread):
             
 
 class Service:
-    def __init__(self, ctx, name, proccess, params=None):
+    def __init__(self, ctx, name, params=None):
         self.ctx = ctx
         self.eventQueue = queue.Queue()
         self.name = name
-        self.thread = ServiceThread(self, self.name, self.eventQueue, proccess)
+        self.thread = ServiceThread(
+            self, self.name, self.eventQueue, self.event_process)
         self.params = params
         
     def before_start(self):
@@ -56,9 +57,11 @@ class Service:
         self.before_stop()
         logging.debug("service["+self.name+"] stop ...")
         
-        ev = Events.Event('quit', str(1), "quit request")
+        ev = events.Event('quit', str(1), "quit request")
         self.eventQueue.put(ev)
     
+    def event_process(self, e, service=None):
+        print(e.data)
     
 
 
@@ -81,19 +84,17 @@ class ServiceMgr:
             service.before_stop()
             service.stop()
 
-def EventProccess(e):
-    print(e.data)
 
 if __name__ == "__main__":
     services = {
-        'test': Service(None, "test", EventProccess)
+        'test': Service(None, "test")
     }
     mgr = ServiceMgr(None, services)
 
     mgr.start()
 
     for num in range(1, 20):
-        ev = Events.Event('data', str(num), "event:"+str(num))
+        ev = events.Event('data', str(num), "event:"+str(num))
         services['test'].eventQueue.put(ev)
         time.sleep(1)
 

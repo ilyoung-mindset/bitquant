@@ -9,8 +9,8 @@ import time
 import queue
 import json
 
-from bitquant.core import Service
-from bitquant.core import Events
+from bitquant.core import service
+from bitquant.core import events
 
 '''
 Lbank Market websocket API
@@ -54,7 +54,7 @@ class WSThread(threading.Thread):
                     else:
                         logging.debug("data:"+result)
             
-            r = self.EventProcess()
+            r = self.event_process()
             if r :
                 logging.info('worker thread quit')
                 return True
@@ -87,7 +87,7 @@ class WSThread(threading.Thread):
             logging.debug("sub :"+json_str)
             self.ws.send(json_str)
                 
-    def EventProcess (self):
+    def event_process (self):
         while self.eventQueue.qsize() > 0:
             event = self.eventQueue.get()
             if event.event == 'quit':
@@ -98,25 +98,21 @@ class WSThread(threading.Thread):
                 logging.debug("req :"+json_str)
                 self.ws.send(json_str)
 
-class LbankWSService(Service.Service):
-    def __init__(self, ctx):
-        Service.Service.__init__(self, ctx, "LbankWSService", EventProccess)
-        self.eventHandler = EventProccess
+
+class LbankWSService(service.Service):
+    def __init__(self, ctx, params=None):
+        service.Service.__init__(self, ctx, "LbankService", params)
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)
 
     def start(self):
-        Service.Service.start(self)
+        service.Service.start(self)
         self.WSThread.start()
 
     def stop(self):
-        ev = Events.Event('quit', str(1), "quit request")
+        ev = events.Event('quit', str(1), "quit request")
         self.WSQueue.put(ev)
-        Service.Service.stop(self)
-
-def EventProccess(e):
-    logging.debug(e.data)
-
+        service.Service.stop(self)
 
 if __name__ == "__main__":
     service = LbankWSService(None)

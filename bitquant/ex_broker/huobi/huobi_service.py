@@ -8,8 +8,8 @@ import time
 import queue
 import json
 
-from bitquant.core import Service
-from bitquant.core import Events
+from bitquant.core import service
+from bitquant.core import events
 
 from bitquant.ex_broker.huobi import huobi_rest
 
@@ -117,31 +117,29 @@ class WSThread(threading.Thread):
                 logging.debug("req :"+json_str)
                 self.ws.send(json_str)
 
-class HuobiService(Service.Service):
+class HuobiService(service.Service):
     def __init__(self, ctx, params=None):
-        Service.Service.__init__(
-            self, ctx, "HuobiService", EventProccess, params)
-        self.eventHandler = EventProccess
+        service.Service.__init__(self, ctx, "HuobiService", params)
         self.WSQueue = queue.Queue()
         self.WSThread = WSThread(self.WSQueue, self)
 
     def start(self):
-        Service.Service.start(self)
+        service.Service.start(self)
         self.WSThread.start()
 
         self.ctx['app'].evt_mng.sub_event('market.huobi.get', self)
 
     def stop(self):
-        ev = Events.Event('quit', str(1), "quit request")
+        ev = events.Event('quit', str(1), "quit request")
         self.WSQueue.put(ev)
-        Service.Service.stop(self)
+        service.Service.stop(self)
 
-def EventProccess(e, service=None):
-    if e.event == 'market.huobi.get': 
-        if e.data['topic'] == 'kline':
-            huobi = huobi_rest.HuobiREST(params=service.params)
-            data = huobi.get_kline(e.data['symbol'], e.data['period'], e.data['size'])
-            service.ctx['app'].pubTask(None, 'exbroker/huobi/rest/kline', '0', data)
+    def event_process(self, e, service=None):
+        if e.event == 'market.huobi.get': 
+            if e.data['topic'] == 'kline':
+                huobi = huobi_rest.HuobiREST(params=service.params)
+                data = huobi.get_kline(e.data['symbol'], e.data['period'], e.data['size'])
+                service.ctx['app'].pubTask(None, 'exbroker/huobi/rest/kline', '0', data)
 
 
 if __name__ == "__main__":

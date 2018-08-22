@@ -3,11 +3,10 @@ import json
 import pymysql.cursors
 import time
 import uuid
-from bitquant.core import Task
-from bitquant.core import Worker
+from bitquant.core import worker
 
 
-class EXMarketWorker(Worker.Worker):
+class EXMarketWorker(worker.Worker):
     def run(self):
         data = self.task.data
         
@@ -60,7 +59,3 @@ class EXMarketWorker(Worker.Worker):
             #db.rollback()
         
         return True
-
-class Router(Worker.Router):
-    def newWorker(self, task):
-        return EXMarketWorker(task)

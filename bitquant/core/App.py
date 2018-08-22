@@ -1,10 +1,9 @@
 import logging
 import time
 
-from bitquant.core import Service
-from bitquant.core import Events
-from bitquant.core import Worker
-from bitquant.core import Task
+from bitquant.core import service
+from bitquant.core import events
+from bitquant.core import worker
 
 class App(object):
     def __init__(self, ctx, services, routes):
@@ -16,21 +15,20 @@ class App(object):
 
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
-        formatter = logging.Formatter(
-            '%(name)-12s: %(levelname)-8s %(message)s')
+        formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
         console.setFormatter(formatter)
         logging.getLogger('').addHandler(console)
 
         self.ctx = ctx
 
         self.routes = routes
-        self.evt_mng = Events.EventMananger()
+        self.evt_mng = events.EventMananger()
 
         self.services = services
-        self.services['WorkerService'] = Worker.WorkerService(
+        self.services['WorkerService'] = worker.WorkerService(
             self.ctx, self.routes)
 
-        self.servMgr = Service.ServiceMgr(self.ctx, services)
+        self.servMgr = service.ServiceMgr(self.ctx, services)
 
     def run(self):
         self.servMgr.start()
@@ -42,4 +40,4 @@ class App(object):
         logging.info('bitquant shutdown')
     
     def pubTask(self, ctx, action, id, data):
-        self.services['WorkerService'].pubTask(ctx, action, id, data)
+        self.services['WorkerService'].pub_task(ctx, action, id, data)

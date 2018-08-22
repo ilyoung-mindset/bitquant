@@ -2,15 +2,13 @@ import threading
 import time
 import queue
 import logging
-from bitquant.core import Service
-from bitquant.core import Events
-from bitquant.core import Task
-from bitquant.core import Worker
+from bitquant.core import service
+from bitquant.core import events
+from bitquant.core import worker
 
 '''
 Market data API
 '''
-
 
 class WorkerThread(threading.Thread):
     def __init__(self, q, service):
@@ -23,7 +21,7 @@ class WorkerThread(threading.Thread):
         s = False
 
         while True:
-            ev = Events.Event('market.huobi.get', str(
+            ev = events.Event('market.huobi.get', str(
                  1), {'topic': 'kline', 'symbol': 'ethusdt', 'period': '1day', 'size': 2000})
             
             if not s:
@@ -31,42 +29,35 @@ class WorkerThread(threading.Thread):
                 if r:
                     s = True
 
-            r = self.TaskProcess()
+            r = self.task_process()
             if r:
                 break;
 
             time.sleep(60)
             
-
-    def TaskProcess (self):
+    def task_process(self):
         while self.taskQueue.qsize() > 0:
             worker = self.taskQueue.get()
             if worker.task.action == 'quit':
                 return True
             
            
-
-class EXBrokerService(Service.Service):
+class EXBrokerService(service.Service):
     def __init__(self, ctx):
-        Service.Service.__init__(self, ctx, "EXBroker", EventProccess)
-        self.eventHandler = EventProccess
+        service.Service.__init__(self, ctx, "EXBroker")
         self.taskQueue = queue.Queue()
         self.workThread = WorkerThread(self.taskQueue, self)
 
     def start(self):
-        Service.Service.start(self)
+        service.Service.start(self)
         self.workThread.start()
 
     def stop(self):
-        quitTask = Task.Task(self, 'quit', str(0), "quit task thread")
-        worker = Worker.Worker(quitTask)
+        quitTask = worker.Task(self, 'quit', str(0), "quit task thread")
+        wk = worker.Worker(quitTask)
 
-        self.taskQueue.put(worker)
-
-        Service.Service.stop(self)
-
-def EventProccess(e, service=None):
-    logging.debug(e.data)
+        self.taskQueue.put(wk)
+        service.Service.stop(self)
   
 
 if __name__ == "__main__":
@@ -74,7 +65,7 @@ if __name__ == "__main__":
     service.start()
 
     for num in range(1, 5):
-        ev = Events.Event('data', str(num), "event:"+str(num))
+        ev = events.Event('data', str(num), "event:"+str(num))
         service.eventQueue.put(ev)
         time.sleep(1)
 

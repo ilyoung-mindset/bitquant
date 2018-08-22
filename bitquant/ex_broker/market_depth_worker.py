@@ -2,11 +2,10 @@ import logging
 import json
 import pymysql.cursors
 import time
-from bitquant.core import Task
-from bitquant.core import Worker
+from bitquant.core import worker
 
 
-class EXDepthWorker(Worker.Worker):
+class EXDepthWorker(worker.Worker):
     def run(self):
         data = self.task.data
        
@@ -55,8 +54,3 @@ class EXDepthWorker(Worker.Worker):
 
         finally:
             db.close()
-
-
-class Router(Worker.Router):
-    def newWorker(self, task):
-        return EXDepthWorker(task)
