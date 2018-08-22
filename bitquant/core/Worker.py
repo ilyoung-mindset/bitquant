@@ -36,7 +36,7 @@ class Router:
         self.worker_class = worker_class
         self.options = options
 
-    def newWorker(self, task):
+    def new_worker(self, task):
         return self.worker_class(task)
     
 class WorkerThread(threading.Thread):
@@ -126,7 +126,7 @@ class WorkerService(service.Service):
             logging.warning("task["+task.action+"] not found.")
             return False
 
-        worker = self.routes[task.action].newWorker(task)
+        worker = self.routes[task.action].new_worker(task)
         if worker == None:
             logging.error("create worker error")
             return False

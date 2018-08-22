@@ -29,7 +29,7 @@ class WSThread(threading.Thread):
     def run(self):
         while True:
             self.connect()
-            self.subTopics()
+            self.sub_topics()
             r = self.process()
             if r:
                 return;
@@ -48,7 +48,7 @@ class WSThread(threading.Thread):
                 ts = result[8:21]
                 pong = '{"pong":'+ts+'}'
                 self.ws.send(pong)
-                self.subTopics()
+                self.sub_topics()
 
             else:
                 if self.service.ctx == None :
@@ -65,12 +65,12 @@ class WSThread(threading.Thread):
 
                         chs = data['ch'].split('.')
                         ch = chs[2]
-                        self.service.ctx['app'].pubTask(
+                        self.service.ctx['app'].pub_task(
                             None, 'exbroker/huobi/ws/'+ch, '0', data)
                     else:
                         logging.debug("data:"+result)
             
-            r = self.EventProcess()
+            r = self.event_thread()
             if r :
                 logging.info('worker thread quit')
                 return True
@@ -100,13 +100,13 @@ class WSThread(threading.Thread):
                 logging.error('connect ws error,retry...')
                 time.sleep(5)
 
-    def subTopics(self):
+    def sub_topics(self):
         for reqData in self.service.params['websocket']['subs']:
             json_str = json.dumps(reqData)
             logging.debug("sub :"+json_str)
             self.ws.send(json_str)
                 
-    def EventProcess (self):
+    def event_thread (self):
         while self.eventQueue.qsize() > 0:
             event = self.eventQueue.get()
             if event.event == 'quit':
@@ -139,7 +139,7 @@ class HuobiService(service.Service):
             if e.data['topic'] == 'kline':
                 huobi = huobi_rest.HuobiREST(params=service.params)
                 data = huobi.get_kline(e.data['symbol'], e.data['period'], e.data['size'])
-                service.ctx['app'].pubTask(None, 'exbroker/huobi/rest/kline', '0', data)
+                service.ctx['app'].pub_task(None, 'exbroker/huobi/rest/kline', '0', data)
 
 
 if __name__ == "__main__":

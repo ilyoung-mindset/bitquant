@@ -10,7 +10,7 @@ from daemon.runner import DaemonRunner
 
 from bitquant.core import worker
 
-from bitquant.core import App
+from bitquant.core import application
 from bitquant.params import Params
 
 from bitquant.ex_broker import ex_broker_service
@@ -47,7 +47,7 @@ services = {
     'EXBrokerService': ex_broker_service.EXBrokerService(ctx),
 }
 
-app = App.App(ctx, services, routes)
+app = application.Application(ctx, services, routes)
 
 ctx['app'] = app
 

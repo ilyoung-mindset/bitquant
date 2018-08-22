@@ -27,7 +27,7 @@ class WSThread(threading.Thread):
     def run(self):
         while True:
             self.connect()
-            self.subTopics()
+            self.sub_topics()
             r = self.process()
             if r:
                 return;
@@ -41,7 +41,7 @@ class WSThread(threading.Thread):
             if data.__contains__('action') and data['action'] == 'ping':
                 pong = '{"action": "pong", "pong": "'+data['ping']+'"}'
                 self.ws.send(pong)
-                self.subTopics()
+                self.sub_topics()
 
             else:
                 if self.service.ctx == None :
@@ -50,7 +50,8 @@ class WSThread(threading.Thread):
                 else :
                     #print("raw: "+result);
                     if data.__contains__('pair'):
-                        self.service.ctx['app'].pubTask(None, 'exbroker/lbank/ws', '0', data)
+                        self.service.ctx['app'].pub_task(
+                            None, 'exbroker/lbank/ws', '0', data)
                     else:
                         logging.debug("data:"+result)
             
@@ -81,7 +82,7 @@ class WSThread(threading.Thread):
                 logging.error('connect ws error,retry...')
                 time.sleep(5)
 
-    def subTopics(self):
+    def sub_topics(self):
         for reqData in self.service.ctx['params']['market']['lbank']['websocket']['subs']:
             json_str = json.dumps(reqData)
             logging.debug("sub :"+json_str)

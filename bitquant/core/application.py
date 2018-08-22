@@ -5,7 +5,7 @@ from bitquant.core import service
 from bitquant.core import events
 from bitquant.core import worker
 
-class App(object):
+class Application(object):
     def __init__(self, ctx, services, routes):
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
@@ -39,5 +39,5 @@ class App(object):
         self.servMgr.stop()
         logging.info('bitquant shutdown')
     
-    def pubTask(self, ctx, action, id, data):
+    def pub_task(self, ctx, action, id, data):
         self.services['WorkerService'].pub_task(ctx, action, id, data)

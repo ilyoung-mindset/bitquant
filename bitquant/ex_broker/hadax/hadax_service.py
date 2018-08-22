@@ -26,7 +26,7 @@ class WSThread(threading.Thread):
     def run(self):
         while True:
             self.connect()
-            self.subTopics()
+            self.sub_topics()
             r = self.process()
             if r:
                 return;
@@ -45,7 +45,7 @@ class WSThread(threading.Thread):
                 ts = result[8:21]
                 pong = '{"pong":'+ts+'}'
                 self.ws.send(pong)
-                self.subTopics()
+                self.sub_topics()
 
             else:
                 if self.service.ctx == None :
@@ -63,7 +63,7 @@ class WSThread(threading.Thread):
 
                         chs = data['ch'].split('.')
                         ch = chs[2]
-                        self.service.ctx['app'].pubTask(
+                        self.service.ctx['app'].pub_task(
                             None, 'exbroker/hadax/ws/'+ch, '0', data)
                     else:
                         logging.debug("data:"+result)
@@ -98,7 +98,7 @@ class WSThread(threading.Thread):
                 logging.error('connect ws error,retry...')
                 time.sleep(5)
 
-    def subTopics(self):
+    def sub_topics(self):
         for reqData in self.service.params['websocket']['subs']:
             json_str = json.dumps(reqData)
             logging.debug("sub :"+json_str)
