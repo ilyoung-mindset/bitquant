@@ -10,7 +10,7 @@ Differentiate yourself in the world from anyone else.
 #######################################################布林带突破策略  
 #原理：突破95日均线，方差为2的布林带，进场；价格跌破34日均线的时候离场  
 ######################################################引入相应模块  
-from OkcoinSpotAPI import *  
+from bitquant.ex_broker.okex.okex_rest import *  
 import pandas as pd  
 import numpy as np  
 import datetime  
@@ -74,4 +74,4 @@ while True:
     now=datetime.datetime.now()  
     now=now.strftime('%Y-%m-%d %H:%M:%S')   
     i=i+1  
-    print(now,i)</span> 
+    print(now,i)
