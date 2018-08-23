@@ -2,4 +2,4 @@
 
 BIT_QUANT_HOME=`pwd`
 
-python3 -m bitquant.app > ${BIT_QUANT_HOME}/log/std.log &
+python3 -m bitquant.app > ${BIT_QUANT_HOME}/log/std.log 2>&1 &
