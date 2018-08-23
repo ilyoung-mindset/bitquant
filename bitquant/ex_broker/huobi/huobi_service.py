@@ -31,6 +31,8 @@ class WSThread(threading.Thread):
             self.connect()
             self.sub_topics()
             r = self.process()
+            self.ws.close()
+
             if r:
                 return;
         
@@ -39,11 +41,11 @@ class WSThread(threading.Thread):
         while(1):
             try:
                 compressData = self.ws.recv()
+                result = gzip.decompress(compressData).decode('utf-8')
             except BaseException as e:
                 logging.error(e)
                 return False
             
-            result = gzip.decompress(compressData).decode('utf-8')
             if result[:7] == '{"ping"':
                 ts = result[8:21]
                 pong = '{"pong":'+ts+'}'
@@ -139,6 +141,7 @@ class HuobiService(service.Service):
             if e.data['topic'] == 'kline':
                 huobi = huobi_rest.HuobiREST(params=service.params)
                 data = huobi.get_kline(e.data['symbol'], e.data['period'], e.data['size'])
+                
                 service.ctx['app'].pub_task(None, 'exbroker/huobi/rest/kline', '0', data)
 
 

@@ -30,6 +30,7 @@ routes = {
     'exbroker/hadax/ws/depth': worker.Router(market_depth_worker.EXDepthWorker),
     'exbroker/hadax/ws/kline': worker.Router(market_kline_woker.EXMarketWorker),
     'exbroker/hadax/ws/trade': worker.Router(market_trade_worker.EXTradeWorker),
+    'exbroker/hadax/rest/kline': worker.Router(market_kline_woker.EXMarketWorker),
     
     #'exbroker/lbank/ws': worker.Router(market_trade_worker.EXTradeWorker),
 

@@ -5,7 +5,7 @@ import logging
 from bitquant.core import service
 
 '''
-Market data API
+worker service
 '''
 
 class Task:

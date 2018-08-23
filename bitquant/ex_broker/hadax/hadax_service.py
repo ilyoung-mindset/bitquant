@@ -10,6 +10,7 @@ import json
 
 from bitquant.core import service
 from bitquant.core import events
+from bitquant.ex_broker.huobi import huobi_rest
 
 '''
 Hadax Market websocket API
@@ -28,19 +29,24 @@ class WSThread(threading.Thread):
             self.connect()
             self.sub_topics()
             r = self.process()
+            self.ws.close()
+            
             if r:
                 return;
-        
+
+           
+
     def process(self):
         
         while(1):
             try:
                 compressData = self.ws.recv()
+                result = gzip.decompress(compressData).decode('utf-8')
             except BaseException as e:
                 logging.error(e)
                 return False
             
-            result = gzip.decompress(compressData).decode('utf-8')
+           
             if result[:7] == '{"ping"':
                 ts = result[8:21]
                 pong = '{"pong":'+ts+'}'
@@ -124,11 +130,22 @@ class HadaxService(service.Service):
     def start(self):
         service.Service.start(self)
         self.WSThread.start()
+        self.ctx['app'].evt_mng.sub_event('market.hadax.get', self)
 
     def stop(self):
         ev = events.Event('quit', str(1), "quit request")
         self.WSQueue.put(ev)
         service.Service.stop(self)
+    
+    def event_process(self, e, service=None):
+        if e.event == 'market.hadax.get':
+            if e.data['topic'] == 'kline':
+                huobi = huobi_rest.HuobiREST(
+                    market_url="https://api.hadax.com", trade_url="https://api.hadax.com", params=service.params)
+                data = huobi.get_kline(
+                    e.data['symbol'], e.data['period'], e.data['size'])
+                service.ctx['app'].pub_task(
+                    None, 'exbroker/hadax/rest/kline', '0', data)
 
 if __name__ == "__main__":
     service = HadaxService(None)
