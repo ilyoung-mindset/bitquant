@@ -103,12 +103,21 @@ CREATE TABLE `tx` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4  
 
+CREATE TABLE `market_symbols` (
+  `market` varchar(35) NOT NULL,
+  `tx_type` varchar(35) NOT NULL,
+  `symbol` varchar(64) DEFAULT NULL,
+  `create_date` varchar(8) DEFAULT NULL,
+  `create_time` varchar(14) DEFAULT NULL,
+  }
+  
 CREATE TABLE `market_schedule` (
   `id` varchar(35) NOT NULL,
   `market` varchar(35) NOT NULL,
   `api` varchar(256) NOT NULL,
   `reqs` varchar(4000)  DEFAULT NULL,
   `req_tpl` varchar(512) DEFAULT NULL,
+  `req_first_tpl` varchar(512) DEFAULT NULL,
   `freq` varchar(8) DEFAULT NULL,
   `action` varchar(256) DEFAULT NULL,
   `last_run_time`   bigint(20)  default 0 comment '上次创建时间',
@@ -149,9 +158,11 @@ CREATE TABLE `strategy_schedule` (
   `strategy_id` varchar(35) NOT NULL,
   `uid` varchar(35) NOT NULL,
   `freq` char(1) DEFAULT NULL,
-  `time` varchar(14) DEFAULT NULL,
-  `action` varchar(14) DEFAULT NULL,
-  `last_run_time`  timestamp default '0000-00-00 00:00:00' comment '首次创建时间',
+  `action` varchar(256) DEFAULT NULL,
+  `data` varchar(512) DEFAULT NULL,
+  `status` char(2) DEFAULT NULL,
+  `last_run_time`   bigint(20)  default 0 comment '上次创建时间',
+  `next_run_time`   bigint(20)  default 0 comment '下次创建时间',
   `update_time` varchar(14) DEFAULT NULL,
   `create_date` varchar(8) DEFAULT NULL,
   `create_time` varchar(14) DEFAULT NULL,
@@ -226,10 +237,6 @@ CREATE TABLE base_job_schedule
         primary key (schedule_id)
     )
     ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务日程表';
-    
-    
-    
-    
     
     CREATE TABLE base_job_schedule_state
     (

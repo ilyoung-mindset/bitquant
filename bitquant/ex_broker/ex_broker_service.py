@@ -84,7 +84,7 @@ class WorkerThread(threading.Thread):
             if worker.task.action == 'quit':
                 return True
             
-           
+        
 class EXBrokerService(service.Service):
     def __init__(self, ctx):
         service.Service.__init__(self, ctx, "EXBroker")

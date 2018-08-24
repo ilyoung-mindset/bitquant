@@ -6,7 +6,6 @@ import time
 import signal
 import logging
 import optparse
-from daemon.runner import DaemonRunner
 
 from bitquant.core import worker
 
@@ -23,6 +22,8 @@ from bitquant.ex_broker import market_trade_worker
 from bitquant.ex_broker import market_kline_woker
 from bitquant.ex_broker import market_depth_worker
 
+from bitquant.core import stratery_engine
+
 routes = {
     'exbroker/huobi/ws/depth': worker.Router(market_depth_worker.EXDepthWorker),
     'exbroker/huobi/ws/kline': worker.Router(market_kline_woker.EXMarketWorker),
@@ -35,6 +36,10 @@ routes = {
     #'exbroker/lbank/ws': worker.Router(market_trade_worker.EXTradeWorker),
 
     'exbroker/hadax/ws/depth': worker.Router(inner_market_tick.MarketInnerWorker, {'fifo': True}),
+
+    'stratery/tick': worker.Router(stratery_engine.StrateryWorker),
+    'stratery/min': worker.Router(stratery_engine.StrateryWorker),
+    'stratery/day': worker.Router(stratery_engine.StrateryWorker),
 }
 
 ctx = {
@@ -46,6 +51,7 @@ services = {
     'HadaxService': hadax_service.HadaxService(ctx, Params.paramsHadax.params),
     #'LbankWSService': lbank_service.LbankWSService(ctx),
     'EXBrokerService': ex_broker_service.EXBrokerService(ctx),
+    'StrateryService': stratery_engine.StrateryService(ctx),
 }
 
 app = application.Application(ctx, services, routes)
@@ -65,10 +71,5 @@ if __name__ == "__main__":
     options, args = parse.parse_args()
 
     signal.signal(signal.SIGTERM, appQuit)
-
-    if options.daemon:
-        print("run as daemon")
-        run = DaemonRunner(app)
-        run.do_action()
-    else:
-        app.run()
+  
+    app.run()
