@@ -8,43 +8,11 @@ from bitquant.core import service
 from bitquant.core import events
 from bitquant.core import worker
 import importlib
+from bitquant.core import context
 
 '''
-Stratery service
+Strategy service
 '''
-
-
-class StrateryWorker(worker.Worker):
-    def run(self):
-        task_data = self.task.data
-        module_name = 'bitquant.stratery.'+task_data['id']
-        module_stratery = importlib.import_module(module_name)
-        if module_stratery == None:
-            logging.error('import module ['+module_name+'] error')
-            return
-
-        self.freq = task_data['type']
-        self.stratery = task_data['id']
-
-        module_stratery.order = self.order
-
-        func_name = 'handle_data'
-        if task_data['type'] == 'tick':
-            func_name = 'handle_tick'
-
-        handle_func = getattr(module_stratery, func_name)
-        if handle_func == None: 
-            logging.error('import module ['+module_name+'] fun['+func_name+']')
-            return 
-
-        logging.info('excute ['+module_name+'] fun['+func_name+']')
-        handle_func(None)
-    
-    def order(self, amount, price):
-        print('freq[%s] buy amount[%f] price[%s]' % (self.freq, amount, price))
-        logging.info('freq[%s] buy amount[%f] price[%s]' %
-            (self.freq, amount, price))
-        
 
 class WorkThread(threading.Thread):
     def __init__(self, q, service):
@@ -68,6 +36,9 @@ class WorkThread(threading.Thread):
 
             cur_time = time.localtime()
             cur_sec = time.strftime("%Y%m%d%H%M", cur_time)
+            cur_min = time.strftime("%Y%m%d%H%M", cur_time)
+            cur_day = time.strftime("%Y%m%d", cur_time)
+
             if last_sec != None and last_sec == cur_sec:
                 time.sleep(1)
                 continue
@@ -90,16 +61,25 @@ class WorkThread(threading.Thread):
 
                 logging.debug(action+":"+row['data'])
 
+                did = time.mktime(time.strptime(cur_sec, '%Y%m%d%H%M'))
+                if row['freq'] == 'd':
+                    did = time.mktime(time.strptime(cur_day, '%Y%m%d'))
+
                 task_data = json.loads(row['data'])
+                task_data['id'] = row['strategy_id']
+                task_data['uid'] = row['uid']
+               
+                task_data['did'] = did
+
+                next_time1 = time.strftime( "%Y%m%d%H%M", time.localtime(time.time()+60))
+                next_time = time.mktime( time.strptime(next_time1, '%Y%m%d%H%M'))
+                if row['freq'] == 'd':
+                    next_time1 = time.strftime( "%Y%m%d", time.localtime(time.time()+60*60*24))
+                    next_time = time.mktime( time.strptime(next_time1, '%Y%m%d'))
+                
 
                 if self.service.ctx != None:
                     self.service.ctx['app'].pub_task( None, action, '0', task_data)
-
-                next_time1 = time.strftime("%Y%m%d%H%M", time.localtime(time.time()+60))
-                next_time = time.mktime(time.strptime(next_time1, '%Y%m%d%H%M'))
-                if row['freq'] == 'd':
-                    next_time1 = time.strftime("%Y%m%d", time.localtime(time.time()+60*60*24))
-                    next_time = time.mktime(time.strptime(next_time1, '%Y%m%d'))
 
                 sql_update = "update strategy_schedule set last_run_time=%d, next_run_time=%d where id='%s'" % (
                     time.time(), next_time, row['id'])
@@ -122,9 +102,9 @@ class WorkThread(threading.Thread):
             if worker.task.action == 'quit':
                 return True
 
-class StrateryService(service.Service):
+class StrategyService(service.Service):
     def __init__(self, ctx):
-        service.Service.__init__(self, ctx, "StrateryService")
+        service.Service.__init__(self, ctx, "StrategyService")
         self.taskQueue = queue.Queue()
         self.workThread = WorkThread(self.taskQueue, self)
 
@@ -141,7 +121,7 @@ class StrateryService(service.Service):
 
 
 if __name__ == "__main__":
-    svr = StrateryService(None)
+    svr = StrategyService(None)
     svr.start()
 
     for num in range(1, 5):

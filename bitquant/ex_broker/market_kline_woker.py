@@ -4,6 +4,7 @@ import pymysql.cursors
 import time
 import uuid
 from bitquant.core import worker
+from bitquant.core import context
 
 
 class EXMarketWorker(worker.Worker):
@@ -24,6 +25,10 @@ class EXMarketWorker(worker.Worker):
         if actions[2] == 'ws':
             record = data['tick']
             self.update_kline_data(market, symbol, period, record, db)
+            ctx = context.get_context()
+            if ctx != None:
+                tick_task = {'market': market, 'dtype': 'kline', 'symbol': symbol, 'did': record['id'], 'period': period}
+                ctx['app'].pub_task( None, 'exbroker/kline/tick', '0', tick_task)
         else:
             for record in data['data']:
                 ret = self.update_kline_data(market, symbol, period, record, db)

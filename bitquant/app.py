@@ -10,6 +10,7 @@ import optparse
 from bitquant.core import worker
 
 from bitquant.core import application
+from bitquant.core import context
 from bitquant.params import Params
 
 from bitquant.ex_broker import ex_broker_service
@@ -22,7 +23,10 @@ from bitquant.ex_broker import market_trade_worker
 from bitquant.ex_broker import market_kline_woker
 from bitquant.ex_broker import market_depth_worker
 
-from bitquant.core import stratery_engine
+from bitquant.strategy import strategy_service
+from bitquant.strategy import strategy_worker
+
+context._init()
 
 routes = {
     'exbroker/huobi/ws/depth': worker.Router(market_depth_worker.EXDepthWorker),
@@ -37,21 +41,22 @@ routes = {
 
     'exbroker/hadax/ws/depth': worker.Router(inner_market_tick.MarketInnerWorker, {'fifo': True}),
 
-    'stratery/tick': worker.Router(stratery_engine.StrateryWorker),
-    'stratery/min': worker.Router(stratery_engine.StrateryWorker),
-    'stratery/day': worker.Router(stratery_engine.StrateryWorker),
+    'exbroker/kline/tick': worker.Router(strategy_worker.StrategyTickWorker),
+
+    'strategy/tick': worker.Router(strategy_worker.StrategyWorker),
+    'strategy/min': worker.Router(strategy_worker.StrategyWorker),
+    'strategy/day': worker.Router(strategy_worker.StrategyWorker),
 }
 
-ctx = {
-    'params': Params.params
-}
+ctx = context.get_context()
+ctx['params'] = Params.params
 
 services = {
     'HuobiService': huobi_service.HuobiService(ctx, Params.paramsHuobi.params),
     'HadaxService': hadax_service.HadaxService(ctx, Params.paramsHadax.params),
     #'LbankWSService': lbank_service.LbankWSService(ctx),
     'EXBrokerService': ex_broker_service.EXBrokerService(ctx),
-    'StrateryService': stratery_engine.StrateryService(ctx),
+    'StrategyService': strategy_service.StrategyService(ctx),
 }
 
 app = application.Application(ctx, services, routes)

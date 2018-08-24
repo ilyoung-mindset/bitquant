@@ -32,17 +32,6 @@ run_XXX 指定的函数只能有一个参数 context, data 不再提供, 请使�
 [initialize] / [before_trading_start] / [after_trading_end] / [handle_data] 都是可选的, 如果不是必须的, 不要实现这些函数, 一个空函数会降低运行速度.
 '''
 
-# 第一部分：策略参数
-start = '20160101'                                  # 回测起始时间
-end = '20180101'                                    # 回测结束时间
-#benchmark = 'HS300'                                # 策略参考标准
-universe = ['huobi.ethusdt', 'huobi.btcusdt']       # 证券池
-capital_base = 100000                               # 起始资金
-freq = 'd'                                          # 用日线回测的策略
-
-# 调仓频率，表示执行handle_data的时间间隔，若freq = 'd'时间间隔的单位为交易日，若freq = 'm'时间间隔为分钟
-refresh_rate = 1                                # 每天调一次仓，即每个交易日都会运行handle_data函数
-
 def initialize(context):
     print('initialize')
 
@@ -56,16 +45,13 @@ def before_trading_start(context):
 
 
 def handle_data(context):
-    order(1000, 100)
-    print('hadle_data')
-
+    context.order(context.market, 'ethbtc', 1000, 100)
 
 def handle_tick(context):
-    print('handle_tick')
+    context.order(context.market, 'ethbtc', 1000, 200)
 
 def after_trading_end(context):
     print('after_trading_end')
-
 
 def on_strategy_end(context):
     print('on_strategy_end')
