@@ -3,7 +3,7 @@ import time
 import queue
 import logging
 import json
-import pymysql.cursors
+from bitquant.db import mysql_db
 from bitquant.core import service
 from bitquant.core import events
 from bitquant.core import worker
@@ -35,7 +35,7 @@ class StrategyWorker(worker.Worker):
         logging.debug('excute ['+module_name+'] fun['+func_name+']')
 
         strategy_context = sctx.StrategyContext(
-            task_data['type'], task_data['market'], task_data['uid'], task_data['did'])
+            task_data['type'], task_data['id'], task_data['market'], task_data['uid'], task_data['did'])
 
         handle_func(strategy_context)
 
@@ -43,9 +43,8 @@ class StrategyWorker(worker.Worker):
 class StrategyTickWorker(worker.Worker):
     def run(self):
          # 连接MySQL数据库
-        db = pymysql.connect(host='10.1.3.96', port=3306, user='bitquant_test', password='bitquant_test', db='bitquant_test',
-                             charset='utf8', cursorclass=pymysql.cursors.DictCursor)
-        cursor = db.cursor()
+        db = mysql_db.Mysql()
+        cursor = db._cursor
 
         topic = self.task.data['dtype']
         if self.task.data['dtype'] == 'kline':
@@ -58,7 +57,7 @@ class StrategyTickWorker(worker.Worker):
             results = cursor.execute(sql_query)
         except BaseException as ex:
             logging.error(ex)
-            db.close()
+            db.dispose(0)
             return
 
         results = cursor.fetchall()
@@ -87,4 +86,4 @@ class StrategyTickWorker(worker.Worker):
                 db.rollback()
                 break
 
-        db.close()
+        db.dispose()

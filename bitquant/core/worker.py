@@ -58,7 +58,7 @@ class WorkerThread(threading.Thread):
                 logging.info("["+self.threadID+' quit')
                 break
             
-            logging.debug("["+self.threadID+' start run task:'+worker.task.action)
+            #logging.debug("["+self.threadID+' start run task:'+worker.task.action)
             worker.run()
             
             

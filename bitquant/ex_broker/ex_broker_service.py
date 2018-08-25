@@ -3,7 +3,7 @@ import time
 import queue
 import logging
 import json
-import pymysql.cursors
+from bitquant.db import mysql_db
 from bitquant.core import service
 from bitquant.core import events
 from bitquant.core import worker
@@ -24,9 +24,9 @@ class WorkerThread(threading.Thread):
         
 
         # 连接MySQL数据库
-        db = pymysql.connect(host='10.1.3.96', port=3306, user='bitquant_test', password='bitquant_test', db='bitquant_test',
-                             charset='utf8', cursorclass=pymysql.cursors.DictCursor)
-        cursor = db.cursor()
+        db = mysql_db.Mysql()
+        cursor = db._cursor
+
         while True:
             sql_query = "SELECT * FROM market_schedule  WHERE next_run_time < '%d'" % time.time()
             try:
@@ -75,7 +75,7 @@ class WorkerThread(threading.Thread):
 
             time.sleep(1)
 
-        db.close()
+        db.dispose()
 
 
     def task_process(self):

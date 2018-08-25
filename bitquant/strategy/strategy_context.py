@@ -3,7 +3,8 @@ import time
 import queue
 import logging
 import json
-import pymysql.cursors
+import uuid
+from bitquant.db import mysql_db
 from bitquant.core import service
 from bitquant.core import events
 from bitquant.core import worker
@@ -11,8 +12,9 @@ import importlib
 from bitquant.core import context
 
 class StrategyContext():
-    def __init__(self, stype, market, uid, did=None, data=None, options=None):
+    def __init__(self, stype, strategy_id, market, uid, did=None, data=None, options=None):
         self.type = stype
+        self.strategy_id = strategy_id
         self.market = market
         self._uid = uid
         self.did = did
@@ -21,8 +23,43 @@ class StrategyContext():
 
     #按数量下单
     def order(self, market, symbol,  amount, price):
-        logging.info('order market[%s]  symbol[%s] amount[%f] price[%s]' %
-                     (market, symbol, amount, price))
+        db = mysql_db.Mysql()
+        
+        s_uuid = ''.join(str(uuid.uuid1()).split('-'))
+        cur_time = time.time()
+        action = 'buy'
+        vol = amount
+
+        if amount < 0:
+            action ='sell'
+            vol = 0-amount
+
+
+        attrs = {
+            'id': s_uuid,
+            'uid': self._uid,
+            'strategy_id': self.strategy_id,
+            'market': market,
+            'symbol': symbol,
+            'time': '%d' % cur_time,
+            'action': action,
+            'status': '00',
+            'price': '%G' % price,
+            'vol': '%G' % vol,
+            'amount': '%G' % (price*vol),
+            'did': '%d' % self.did,
+            'create_date': time.strftime("%Y%m%d",  time.localtime(cur_time)),
+            'create_time': time.strftime("%Y%m%d%H%M%S",  time.localtime(cur_time)),
+        }
+
+        try:
+            db._insertDic('tx', attrs)
+            logging.info('order stategy[%s] market[%s]  symbol[%s] amount[%f] price[%s]' % (self.strategy_id, market, symbol, amount, price))
+        
+        except BaseException as ex:
+            logging.error(ex)
+       
+        db.dispose()
 
     #目标股数下单
     def order_target(self, market, symbol):

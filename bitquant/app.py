@@ -7,6 +7,7 @@ import signal
 import logging
 import optparse
 
+from bitquant.db import mysql_db 
 from bitquant.core import worker
 
 from bitquant.core import application
@@ -25,6 +26,8 @@ from bitquant.ex_broker import market_depth_worker
 
 from bitquant.strategy import strategy_service
 from bitquant.strategy import strategy_worker
+
+mysql_db._init(Params.params['db'])
 
 context._init()
 

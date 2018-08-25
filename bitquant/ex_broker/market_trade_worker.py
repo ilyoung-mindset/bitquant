@@ -1,6 +1,6 @@
 import logging
 import json
-import pymysql.cursors
+from bitquant.db import mysql_db
 import threading
 import time
 from bitquant.core import worker
@@ -10,16 +10,8 @@ class EXTradeWorker(worker.Worker):
     def run(self):
         data = self.task.data
         
-        #获取threading对象的标识ident
-        #print(threading.currentThread)
-        #print (threading.currentThread().ident)
-
-        # 连接MySQL数据库
-        db = pymysql.connect(host='10.1.3.96', port=3306, user='bitquant_test', password='bitquant_test', db='bitquant_test',
-                            charset='utf8', cursorclass=pymysql.cursors.DictCursor)
-
-        # 通过cursor创建游标
-        cursor = db.cursor()
+        db = mysql_db.Mysql()
+        cursor = db._cursor
 
         actions = self.task.action.split('/')
         market = actions[1]
@@ -42,4 +34,4 @@ class EXTradeWorker(worker.Worker):
                 logging.error(e)
                 db.rollback()
 
-        db.close()
+        db.dispose()

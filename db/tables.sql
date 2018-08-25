@@ -94,8 +94,10 @@ CREATE TABLE `tx` (
   `action` varchar(20) DEFAULT NULL,
   `status` varchar(8) DEFAULT NULL,
   `price`  decimal(65,18) DEFAULT NULL,
-  `count`  decimal(65,18)  DEFAULT NULL COMMENT '金额',
+  `vol`  decimal(65,18)  DEFAULT NULL COMMENT '金额',
+  `amount`  decimal(65,18) DEFAULT NULL,
   `trade_id` varchar(64)  DEFAULT NULL,
+  `did` bigint(20) DEFAULT NULL,
   `end_date` varchar(8) DEFAULT NULL,
   `end_time` varchar(14) DEFAULT NULL,
   `create_date` varchar(8) DEFAULT NULL,
@@ -168,6 +170,23 @@ CREATE TABLE `strategy_schedule` (
   `create_time` varchar(14) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4  
+
+CREATE TABLE `strategy_tick` (
+  `id` varchar(35) NOT NULL,
+  `strategy_id` varchar(35) NOT NULL,
+  `uid` varchar(35) NOT NULL,
+  `market` varchar(35) NOT NULL,
+  `topic` varchar(256) DEFAULT NULL,
+  `action` varchar(256) DEFAULT NULL,
+  `data` varchar(512) DEFAULT NULL,
+  `status` char(2) DEFAULT NULL,
+  `last_run_time`   bigint(20)  default 0 comment '上次创建时间',
+  `update_time` varchar(14) DEFAULT NULL,
+  `create_date` varchar(8) DEFAULT NULL,
+  `create_time` varchar(14) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4  
+
 
   CREATE TABLE base_job
     (

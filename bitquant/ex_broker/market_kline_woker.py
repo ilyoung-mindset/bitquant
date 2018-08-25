@@ -1,6 +1,7 @@
 import logging
 import json
 import pymysql.cursors
+from bitquant.db import mysql_db
 import time
 import uuid
 from bitquant.core import worker
@@ -12,8 +13,8 @@ class EXMarketWorker(worker.Worker):
         data = self.task.data
         
         # 连接MySQL数据库
-        db = pymysql.connect(host='10.1.3.96', port=3306, user='bitquant_test', password='bitquant_test', db='bitquant_test',
-                             charset='utf8', cursorclass=pymysql.cursors.DictCursor)
+        db = mysql_db.Mysql()
+        cursor = db._cursor
 
         actions = self.task.action.split('/')
         market = actions[1]
@@ -33,12 +34,14 @@ class EXMarketWorker(worker.Worker):
             for record in data['data']:
                 ret = self.update_kline_data(market, symbol, period, record, db)
 
-        db.close()
+        db.dispose()
 
 
     def update_kline_data(self, market, symbol, period, record, db):
-        # 通过cursor创建游标
-        cursor = db.cursor()
+        # 连接MySQL数据库
+        db = mysql_db.Mysql()
+        cursor = db._cursor
+        
         date = time.strftime("%Y%m%d", time.localtime())
         datetime = time.strftime("%Y%m%d%H%M%S", time.localtime())
 

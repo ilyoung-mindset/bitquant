@@ -17,7 +17,8 @@ python3 -m pip install requests
 python3 -m pip install websocket_client
 python3 -m pip install 'python-daemon'
 python3 -m pip install PyMySQL
-python3 -m pip install  sqlalchemy
+python3 -m pip install sqlalchemy
+python3 -m pip install DBUtils
 python3 -m pip install flask
 ```
 
