@@ -67,7 +67,7 @@ app = application.Application(ctx, services, routes)
 ctx['app'] = app
 
 def appQuit(signum, frame):
-    logging.warning('receive signal SIGTERM')
+    logging.info('receive exit signal ')
     app.stop()
     
 if __name__ == "__main__":
@@ -79,5 +79,7 @@ if __name__ == "__main__":
     options, args = parse.parse_args()
 
     signal.signal(signal.SIGTERM, appQuit)
+    signal.signal(signal.SIGINT, appQuit)
+
   
     app.run()
