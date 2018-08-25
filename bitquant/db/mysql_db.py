@@ -4,7 +4,7 @@ import pymysql
 from DBUtils.PooledDB import PooledDB
 
 """  
-Config是一些数据库的配置文件  
+mysql db support lib  
 """
 
 def _init(params):
@@ -268,7 +268,7 @@ class Mysql(object):
         @return: result list/boolean 查询到的结果集  
         """
 
-        count = self.__query(sql, parm)
+        count = self.__query(sql, param)
         if count > 0:
             result = self._cursor.fetchmany(num)
         else:
@@ -322,6 +322,6 @@ class Mysql(object):
             self.end('commit')
         else:
             self.end('rollback')
-            
+
         self._cursor.close()
         self._conn.close()
