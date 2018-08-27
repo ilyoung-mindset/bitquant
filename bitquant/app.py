@@ -9,6 +9,7 @@ import optparse
 
 from bitquant.db import mysql_db 
 from bitquant.core import worker
+from bitquant.web import api_gateway
 
 from bitquant.core import application
 from bitquant.core import context
@@ -79,7 +80,10 @@ if __name__ == "__main__":
     options, args = parse.parse_args()
 
     signal.signal(signal.SIGTERM, appQuit)
-    signal.signal(signal.SIGINT, appQuit)
+    # signal.signal(signal.SIGINT, appQuit)
 
   
     app.run()
+
+    api_gateway.api_gateway.run()
+

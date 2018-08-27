@@ -45,10 +45,12 @@ def before_trading_start(context):
 
 
 def handle_data(context):
-    context.order(context.market, 'ethbtc', 1000, 100)
+    #context.order(context.market, 'ethbtc', 1000, 100)
+    pass
 
 def handle_tick(context):
-    context.order(context.market, 'ethbtc', 1000, 200)
+    #context.order(context.market, 'ethbtc', 1000, 200)
+    pass
 
 def after_trading_end(context):
     print('after_trading_end')
